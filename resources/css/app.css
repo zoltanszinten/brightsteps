@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+:root { --font-base: 20px; --letter-space: .04em; }
+html { font-size: var(--font-base); }
+.body-readable { letter-spacing: var(--letter-space); }
