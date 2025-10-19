@@ -13,11 +13,11 @@ import AppFooter from '@/Components/AppFooter.vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const size = ref('md') // md|lg|xl  (alap: md = 20px)
+const size = ref('md')
 
 function applySize(s){
     const map = { md: '18px', lg: '22px', xl: '28px' }
-    document.documentElement.style.setProperty('--font-base', map[s] || '20px')
+    document.documentElement.style.setProperty('--font-base', map[s] || '18px')
 }
 function setSize(s){ size.value = s; applySize(s) }
 

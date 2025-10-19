@@ -6,8 +6,6 @@
             </div>
 
             <nav v-if="showNav" class="hidden sm:flex items-center gap-2 text-sm">
-                <RouterLink to="/" class="px-3 py-2 rounded-xl border border-neutral-800 hover:bg-neutral-900">Bejelentkezés</RouterLink>
-                <a href="#" class="px-3 py-2 rounded-xl border border-neutral-800 hover:bg-neutral-900">Súgó</a>
             </nav>
 
             <div class="flex items-center gap-1">
