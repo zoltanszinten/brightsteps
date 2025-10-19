@@ -1,0 +1,74 @@
+Szereplők
+Admin: Beléphet az adminfelületre, feltölthet képeket, személyre szabhat beállításokat, generálhat tokeneket és megtekintheti a fejlődési statisztikákat.
+Gyermek: Token segítségével, jelszó nélkül beléphet, és elvégzi a játékos feladatokat.
+
+Use Case-ek
+
+1 – Admin bejelentkezik
+
+Az admin hitelesíti magát, hogy elérje az adminfelületet.
+
+Kapcsolódó táblák: users, roles, model_has_roles
+Folyamat:
+-Admin megadja az emailt és jelszót.
+-Rendszer ellenőrzi a hitelesítő adatokat.
+-Sikeres azonosítás esetén session vagy token jön létre.
+-Admin átirányításra kerül a kezelőfelületre.
+
+2 - Token generálás gyermek belépéshez
+
+Admin egy kattintással generál belépési tokent, mellyel a gyermek jelszó nélkül beléphet.
+
+Kapcsolódó táblák: users, personal_access_tokens
+Folyamat:
+-Admin kiválaszt egy gyermeket.
+-Rendszer generál egy egyedi tokent.
+-Token linkként vagy QR-kódként elérhető.
+-Gyermek erre kattintva automatikusan bejelentkezik.
+
+3 – Képfeltöltés és játékhoz rendelés
+
+Admin új képeket tölt fel a játékmodulokhoz.
+
+Kapcsolódó táblák: images, game_types
+Folyamat:
+-Admin kiválasztja a játékmodult (felismerés, memória, térkép).
+-Feltölti a képet, megadja a leírást.
+-Rendszer menti a képet és társítja a játékmodulhoz.
+
+4 – Gyermekre szabott beállítások kezelése
+
+Admin a gyermek igényeihez igazítja a megjelenést és a játékkörnyezetet.
+
+Kapcsolódó táblák: user_settings, color_palettes, users
+Folyamat:
+-Admin kiválasztja a gyermeket.
+-Módosítja a vizuális és funkcionális paramétereket:
+  -kijelző méret (width, height)
+  -betűméret (font_size)
+  -színpaletta (color_palette_id)
+  -modulok engedélyezése (show_card_game, show_recognition_game, show_map_game)
+-Rendszer elmenti az adatokat a user_settings táblába.
+
+5 – Gyermek játszik (feladatvégzés tokennel)
+
+A gyermek az admin által előkészített környezetben végez feladatokat.
+
+Kapcsolódó táblák: games, statistics, user_settings
+Folyamat:
+-Gyermek tokennel belép.
+-Rendszer betölti a user_settings-et és a hozzá rendelt képeket.
+-Gyermek elvégzi a feladatokat (kártya, felismerés, térkép).
+-Teljesítményadatok mentése: statistics táblába (pontok, idők, helyes válaszok).
+-Játék befejezésekor a rendszer frissíti a games rekordot.
+
+6 – Fejlődés követése
+
+Admin elemzi a gyermek teljesítményét és fejlődését.
+
+Kapcsolódó táblák: statistics, games, users
+Folyamat:
+-Admin megnyitja a gyermek statisztikai oldalát.
+-Rendszer összesíti az adatokat (pl. átlagpont, reakcióidő).
+
+-Eredmények grafikonon vagy táblázatban jelennek meg.
