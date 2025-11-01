@@ -53,7 +53,7 @@ services:
     image: mysql:8.0
     container_name: brightsteps-db
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-brightsteps}
       MYSQL_USER: ${DB_USERNAME:-brightsteps}
@@ -61,18 +61,6 @@ services:
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - db-data:/var/lib/mysql
-
-  # Optional: background workers
-  # queue:
-  #   image: brightsteps-php
-  #   container_name: brightsteps-queue
-  #   working_dir: /var/www/html
-  #   command: sh -lc "php artisan queue:listen --tries=1"
-  #   volumes:
-  #     - ./:/var/www/html:cached
-  #   depends_on:
-  #     - app
-  #     - db
 
 volumes:
   db-data:
