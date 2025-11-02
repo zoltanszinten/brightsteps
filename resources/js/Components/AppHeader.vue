@@ -4,21 +4,59 @@
             <div class="flex items-center gap-2">
                 <span class="text-xl font-extrabold tracking-wider">BrightSteps</span>
             </div>
-
-            <nav v-if="showNav" class="hidden sm:flex items-center gap-2 text-sm">
-            </nav>
-
-            <div class="flex items-center gap-1">
-                <button @click="$emit('set-size','md')" class="min-h-[48px] px-3 rounded-lg border text-amber-400 border-amber-400">A−</button>
-                <button @click="$emit('set-size','lg')" class="min-h-[48px] px-3 rounded-lg border font-semibold text-amber-400 border-amber-400">A</button>
-                <button @click="$emit('set-size','xl')" class="min-h-[48px] px-3 rounded-lg border font-bold text-amber-400 border-amber-400">A+</button>
+            <div class="flex items-center gap-4">
+                <span v-if="isLoggedIn" class="text-sm text-amber-400">{{ displayName }}</span>
+                <button v-if="isLoggedIn"
+                        class="px-4 py-3 rounded-2xl border text-amber-400 border-amber-400 hover:bg-slate-900"
+                        @click="logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
+                         stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <path d="M16 17l5-5-5-5"/>
+                        <path d="M21 12H9"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </header>
 </template>
 
-<script setup>
-import { RouterLink } from 'vue-router'
-defineProps({ size: String, showNav: { type: Boolean, default: true } })
-defineEmits(['set-size'])
+<script>
+import api, {tokenKey, userKey} from '@/api'
+import {authState} from "@/authState.js";
+
+export default {
+    name: 'AppHeader',
+    data() {
+        return {}
+    },
+    mounted() {
+
+    },
+    computed: {
+        isLoggedIn() {
+            return authState.loggedIn
+        },
+        displayName() {
+            if (!this.isLoggedIn) return ''
+            try {
+                const user = JSON.parse(localStorage.getItem(userKey))
+                return user?.user?.name
+            } catch {
+                return ''
+            }
+        },
+    },
+    methods: {
+        clearAuthState() {
+            localStorage.removeItem(tokenKey)
+            localStorage.removeItem(userKey)
+        },
+        async logout() {
+            await api.post('/api/logout', {}, {headers: {Accept: 'application/json'}})
+            this.clearAuthState()
+            window.location.href = '/'
+        },
+    },
+}
 </script>

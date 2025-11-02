@@ -76,7 +76,7 @@ export default {
                     localStorage.setItem(userKey, JSON.stringify(user))
                 }
 
-                this.msg = 'Sikeres belépés'
+                window.location.reload()
             } catch (err) {
                 this.msg = 'Hiba a belépésnél'
             }
