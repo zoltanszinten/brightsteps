@@ -2,7 +2,8 @@
     <section class="container mx-auto px-4 py-8">
         <header class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-extrabold tracking-widest text-amber-400">Gyerekek kezelése</h1>
-            <button @click="createChild()" class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400">Új gyerek
+            <button @click="createChild()" class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400">Új
+                gyerek
             </button>
         </header>
 
@@ -26,7 +27,7 @@
                         <button @click="gotoStatistics(c.id)"
                                 class="px-3 py-2 rounded-xl border text-amber-400 border-amber-400">Statisztikák
                         </button>
-                        <button @click="gotoSettings(c.id)"
+                        <button @click="gotoEdit(c.id)"
                                 class="px-3 py-2 rounded-xl border text-amber-400 border-amber-400">Beállítások
                         </button>
                         <button @click="copyLink(c.id)"
@@ -59,18 +60,18 @@ export default {
     computed: {},
     methods: {
         gotoStatistics(id) {
-
+            this.$router.push({name: 'statistics', params: {id}})
         },
-        gotoSettings(id) {
-
+        gotoEdit(id) {
+            this.$router.push({name: 'child-edit', params: {id}})
+        },
+        createChild() {
+            this.$router.push({name: 'child-new'})
         },
         copyLink(id) {
 
         },
         removeChild(id) {
-
-        },
-        createChild(id) {
 
         },
     },

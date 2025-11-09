@@ -1,11 +1,11 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import Login from '@/Pages/Login.vue'
-import ChildSettings from '@/Pages/ChildSettings.vue'
 import ChildrenManager from '@/Pages/ChildrenManager.vue'
 import ChildStats from '@/Pages/ChildStats.vue'
 import CardGame from '@/Pages/CardGame.vue'
 import RecognitionGame from '@/Pages/RecognitionGame.vue'
 import MapGame from '@/Pages/MapGame.vue'
+import ChildForm from '@/Pages/ChildForm.vue'
 
 import api, {tokenKey, userKey} from '@/api'
 import {setLoggedIn} from "@/authState.js";
@@ -15,9 +15,14 @@ const router = createRouter({
     routes: [
         {path: '/', name: 'login', component: Login, meta: {hideNav: true}},
 
-        {path: '/settings', name: 'settings', component: ChildSettings, meta: {hideNav: false, requiresAuth: true}},
+        {path: '/settings', name: 'settings', component: ChildForm, meta: {hideNav: false, requiresAuth: true}},
         {path: '/children', name: 'children', component: ChildrenManager, meta: {hideNav: false, requiresAuth: true}},
-        {path: '/statistics', name: 'statistics', component: ChildStats, meta: {hideNav: false, requiresAuth: true}},
+        {
+            path: '/statistics/:id',
+            name: 'statistics',
+            component: ChildStats,
+            meta: {hideNav: false, requiresAuth: true}
+        },
         {path: '/game/cards', name: 'card-game', component: CardGame, meta: {hideNav: false, requiresAuth: true}},
         {
             path: '/game/recognition',
@@ -26,6 +31,14 @@ const router = createRouter({
             meta: {hideNav: false, requiresAuth: true}
         },
         {path: '/game/map', name: 'map-game', component: MapGame, meta: {hideNav: false, requiresAuth: true}},
+        {path: '/child', name: 'child-new', component: ChildForm, meta: {hideNav: false, requiresAuth: true}},
+        {
+            path: '/child/:id',
+            name: 'child-edit',
+            component: ChildForm,
+            props: true,
+            meta: {hideNav: false, requiresAuth: true}
+        },
     ],
 })
 
