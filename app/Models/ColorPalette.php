@@ -8,6 +8,7 @@ class ColorPalette extends Authenticatable
 {
     protected $fillable = [
         'name',
+        'value',
     ];
 
     public function userSettings()

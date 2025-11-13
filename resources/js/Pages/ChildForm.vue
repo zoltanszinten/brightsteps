@@ -10,7 +10,7 @@
                 </button>
                 <button type="button" @click="save" :disabled="saving"
                         class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400">
-                    {{ saving ? 'Mentés...' : 'Mentés' }}
+                    Mentés
                 </button>
             </div>
         </header>
@@ -35,15 +35,15 @@
                         </div>
                         <div>
                             <label class="block text-sm font-semibold mb-1 text-amber-400" for="ls">Betűköz (em)</label>
-                            <input id="ls" type="range" min="0" max="0.2" step="0.01"
+                            <input id="ls" type="range" min="0" max="20" step="1"
                                    v-model.number="state.letter_spacing" class="w-full"/>
-                            <p class="text-sm text-neutral-300 mt-1">{{ state.letter_spacing.toFixed(2) }} em</p>
+                            <p class="text-sm text-neutral-300 mt-1">{{ (state.letter_spacing / 100).toFixed(2) }} em</p>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold mb-1 text-amber-400" for="lh">Sorköz</label>
-                            <input id="lh" type="range" min="1.2" max="2.0" step="0.05"
+                            <input id="lh" type="range" min="120" max="200" step="5"
                                    v-model.number="state.line_height" class="w-full"/>
-                            <p class="text-sm text-neutral-300 mt-1">{{ state.line_height.toFixed(2) }}</p>
+                            <p class="text-sm text-neutral-300 mt-1">{{ (state.line_height / 100).toFixed(2) }}</p>
                         </div>
                     </div>
                 </section>
@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import api from '../api'
 
 export default {
     name: 'ChildForm',
@@ -128,11 +128,7 @@ export default {
             isEdit: !!this.$route.params.id,
             saving: false,
             form: {name: ''},
-            palettes: [
-                {id: 1, name: 'Alap'},
-                {id: 2, name: 'Extra kontraszt'},
-                {id: 3, name: 'Lágy'},
-            ],
+            palettes: [],
             state: {
                 width: 1280,
                 font_size: 18,
@@ -146,6 +142,7 @@ export default {
         }
     },
     created() {
+        this.fetchPalettes()
         if (this.isEdit) {
             this.fetchChild()
         }
@@ -157,7 +154,7 @@ export default {
         previewStyle() {
             return {
                 letterSpacing: `${this.state.letter_spacing / 100}em`,
-                lineHeight: String(this.state.line_height / 100),
+                lineHeight: this.state.line_height / 100,
                 fontSize: this.state.font_size + 'px',
                 minHeight: '360px',
                 padding: '1rem',
@@ -166,20 +163,28 @@ export default {
         },
     },
     methods: {
+        async fetchPalettes() {
+            const {data} = await api.get('/api/color-palettes')
+            this.palettes = data
+            if (!this.state.color_palette_id && this.palettes.length) {
+                this.state.color_palette_id = this.palettes[0].id
+            }
+        },
         async fetchChild() {
-            const {data} = await axios.get(`/api/child/${this.id}`)
-            this.form.name = data.name
-            if (data.settings) {
-                this.state = Object.assign({}, this.state, data.settings)
+            const {data} = await api.get(`/api/child/${this.id}`)
+            this.form.name = data.child.name
+            if (data.child.setting) {
+                console.log(this.state, data.child.setting)
+                this.state = data.child.setting
             }
         },
         async save() {
             this.saving = true
             const payload = {name: this.form.name, settings: {...this.state}}
             if (this.isEdit) {
-                await axios.put(`/api/child/${this.id}`, payload)
+                await api.put(`/api/child/${this.id}`, payload)
             } else {
-                const {data} = await axios.post(`/api/child`, payload)
+                const {data} = await api.post(`/api/child`, payload)
                 this.id = data.id
             }
             this.saving = false

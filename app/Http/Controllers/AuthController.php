@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,5 +26,11 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         return response()->json(['message' => 'Logged out']);
+    }
+
+    public function token($id){
+        $token = User::where('id', $id)->first()->createToken('api-token')->plainTextToken;
+
+        return response()->json(['token' => $token]);
     }
 }
