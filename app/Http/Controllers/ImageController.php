@@ -45,13 +45,13 @@ class ImageController extends Controller
         return response()->json($image, 201);
     }
 
-    public function destroy(Image $gameImage)
+    public function destroy(Image $image)
     {
-        if ($gameImage->path) {
-            Storage::disk('public')->delete($gameImage->path);
+        if ($image->path) {
+            Storage::disk('public')->delete($image->path);
         }
 
-        $gameImage->delete();
+        $image->delete();
 
         return response()->json(['status' => 'ok']);
     }

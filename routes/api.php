@@ -26,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/images', [ImageController::class, 'index']);
         Route::post('/images', [ImageController::class, 'store']);
-        Route::delete('/images/{gameImage}', [ImageController::class, 'destroy']);
+        Route::delete('/images/{image}', [ImageController::class, 'destroy']);
 
         Route::get('/false-values', [FalseValueController::class, 'index']);
         Route::post('/false-values', [FalseValueController::class, 'store']);

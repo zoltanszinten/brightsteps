@@ -25,9 +25,9 @@ class FalseValueController extends Controller
         return response()->json($item, 201);
     }
 
-    public function destroy(FalseValue $recognitionFalseValue)
+    public function destroy(FalseValue $falseValue)
     {
-        $recognitionFalseValue->delete();
+        $falseValue->delete();
 
         return response()->json(['status' => 'ok']);
     }
