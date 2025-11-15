@@ -1,172 +1,424 @@
 <template>
-    <section class="container mx-auto px-2 sm:px-4 pt-4 pb-8 select-none">
-        <!-- Grid: centered, slightly smaller cards, 9 pairs -->
-        <div class="mx-auto max-w-5xl">
-            <div
-                class="grid gap-3 sm:gap-4 justify-center"
-                :style="{
-          gridTemplateColumns: 'repeat(auto-fit, minmax(' + cardMin + ', ' + cardMin + '))'
-        }"
-                aria-label="Memória kártyák"
-            >
-                <button
-                    v-for="card in cards"
-                    :key="card.uid"
-                    class="relative aspect-square rounded-xl sm:rounded-2xl border text-center font-extrabold focus:outline-none"
-                    :class="cardClass(card)"
-                    :aria-label="ariaLabel(card)"
-                    @click="onFlip(card.uid)"
+    <section
+        class="min-h-screen flex flex-col items-center justify-start pt-4 pb-10 px-2 sm:px-4 select-none"
+        :style="pageStyle"
+    >
+        <div class="w-full flex flex-col items-center gap-6" :style="textBlockStyle">
+            <div class="mx-auto" :style="gridWrapperStyle">
+                <div
+                    class="grid gap-3 sm:gap-4 justify-center"
+                    :style="{
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(' + cardSize + 'px, ' + cardSize + 'px))'
+                    }"
+                    aria-label="Memória kártyák"
                 >
-          <span v-if="isRevealed(card)" class="pointer-events-none text-2xl sm:text-3xl tracking-widest">
-            {{ card.face }}
-          </span>
-                    <span v-else class="pointer-events-none text-neutral-400 text-2xl">?</span>
-                    <span v-if="card.matched" class="absolute top-1.5 right-1.5 text-xs px-2 py-0.5 rounded-full bg-emerald-600 text-white">pár</span>
+                    <button
+                        v-for="card in cards"
+                        :key="card.uid"
+                        class="relative rounded-xl sm:rounded-2xl border text-center font-extrabold focus:outline-none overflow-hidden"
+                        :style="cardStyle(card)"
+                        :aria-label="ariaLabel(card)"
+                        @click="onFlip(card.uid)"
+                    >
+                        <div
+                            class="w-full h-full flex items-center justify-center"
+                            :style="{
+                                width: '100%',
+                                paddingTop: '100%',
+                                position: 'relative'
+                            }"
+                        >
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <template v-if="card.showCheck">
+                                    <span class="check-fade check-fade--visible">
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            class="w-12 h-12"
+                                            :style="checkmarkStyle"
+                                        >
+                                            <circle
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                opacity="0.2"
+                                            />
+                                            <path
+                                                d="M7 12.5L10.2 16 17 8"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2.4"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            />
+                                        </svg>
+                                    </span>
+                                </template>
+                                <template v-else-if="isRevealed(card)">
+                                    <img
+                                        v-if="card.kind === 'image' && card.image"
+                                        :src="imageUrl(card.image.path || card.image.url)"
+                                        :alt="card.value"
+                                        class="w-full h-full object-contain"
+                                    />
+                                    <span
+                                        v-else
+                                        class="pointer-events-none tracking-widest text-center"
+                                        :style="cardTextStyle"
+                                    >
+                                        {{ card.value }}
+                                    </span>
+                                </template>
+                                <template v-else>
+                                    <span class="pointer-events-none">?</span>
+                                </template>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-3 sm:gap-4 mx-auto" :style="hudWrapperStyle">
+                <div class="rounded-2xl border p-4" :style="panelStyle">
+                    <p :style="mutedTextStyle" class="text-sm">Lépések</p>
+                    <p class="text-2xl font-bold">{{ moves }}</p>
+                </div>
+                <div class="rounded-2xl border p-4" :style="panelStyle">
+                    <p :style="mutedTextStyle" class="text-sm">Idő</p>
+                    <p class="text-2xl font-bold">{{ timeText }}</p>
+                </div>
+                <div class="rounded-2xl border p-4" :style="panelStyle">
+                    <p :style="mutedTextStyle" class="text-sm">Párok</p>
+                    <p class="text-2xl font-bold">{{ matchedCount }}/{{ totalPairs }}</p>
+                </div>
+            </div>
+
+            <div
+                v-if="win"
+                class="mx-auto rounded-2xl border p-6 max-w-xl text-center"
+                :style="winPanelStyle"
+            >
+                <p class="text-xl font-bold mb-2">Kész!</p>
+                <p>
+                    Lépések:
+                    <span class="font-semibold">{{ moves }}</span>
+                    • Idő:
+                    <span class="font-semibold">{{ timeText }}</span>
+                </p>
+                <button
+                    class="mt-4 px-4 py-2 rounded-xl border text-sm font-semibold"
+                    :style="primaryButtonStyle"
+                    @click="resetGame"
+                >
+                    Új játék
                 </button>
             </div>
         </div>
-
-        <!-- HUD under grid -->
-        <div class="grid sm:grid-cols-3 gap-3 sm:gap-4 mt-6 mx-auto max-w-3xl">
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Lépések</p>
-                <p class="text-2xl font-bold text-neutral-100">{{ moves }}</p>
-            </div>
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Idő</p>
-                <p class="text-2xl font-bold text-neutral-100">{{ timeText }}</p>
-            </div>
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Párok</p>
-                <p class="text-2xl font-bold text-neutral-100">{{ matchedCount }}/{{ totalPairs }}</p>
-            </div>
-        </div>
-
-        <!-- Win panel -->
-        <div v-if="win" class="mt-6 mx-auto max-w-3xl rounded-2xl border border-amber-400 bg-neutral-900 p-6">
-            <p class="text-xl font-bold text-amber-400 mb-2">Kész!</p>
-            <p class="text-neutral-200">Lépések: <span class="font-semibold">{{ moves }}</span> • Idő: <span class="font-semibold">{{ timeText }}</span></p>
-        </div>
-
-        <p id="live" class="sr-only" role="status" aria-live="polite"></p>
     </section>
 </template>
 
-<script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+<script>
+import api from '../api'
 
-const FACE_SET = [
-    'STOP','BUSZ','METRÓ','ZEBRA','KERÉK','VONAT','LÁMPA','HÍD',
-    'ISKOLA','PARK','ÚT','VÁGÁNY','BALRA','JOBBRA','ÁTJÁRÓ','VESZÉLY',
-]
+export default {
+    name: 'CardGame',
+    data() {
+        return {
+            settings: null,
+            palette: null,
+            gameImages: [],
+            cards: [],
+            firstPick: null,
+            secondPick: null,
+            lock: false,
+            moves: 0,
+            matchedCount: 0,
+            timer: 0,
+            timerHandle: null,
+        }
+    },
+    computed: {
+        totalPairs() {
+            return this.cards.length / 2
+        },
+        win() {
+            return this.totalPairs > 0 && this.matchedCount === this.totalPairs
+        },
+        timeText() {
+            const m = Math.floor(this.timer / 60)
+            const s = this.timer % 60
+            return m ? `${m} p ${String(s).padStart(2, '0')} mp` : `${s} mp`
+        },
+        pageStyle() {
+            if (!this.palette) return {}
+            return {
+                backgroundColor: this.palette.background,
+                color: this.palette.text,
+            }
+        },
+        cardSize() {
+            const fs = this.settings?.font_size ?? 18
+            return Math.max(140, Math.min(fs * 7, 320))
+        },
+        gridWrapperStyle() {
+            const style = { maxWidth: '72rem', width: '100%' }
+            if (this.settings && this.settings.width) {
+                style.maxWidth = this.settings.width + 'px'
+            }
+            return style
+        },
+        hudWrapperStyle() {
+            const style = { maxWidth: '32rem', width: '100%' }
+            if (this.settings && this.settings.width) {
+                style.maxWidth = Math.min(this.settings.width, 800) + 'px'
+            }
+            return style
+        },
+        textBlockStyle() {
+            if (!this.settings) return {}
+            return {
+                letterSpacing: `${(this.settings.letter_spacing ?? 0) / 100}em`,
+                lineHeight: (this.settings.line_height ?? 160) / 100,
+                fontSize: (this.settings.font_size ?? 18) + 'px',
+            }
+        },
+        mutedTextStyle() {
+            if (!this.palette) return {}
+            return { color: this.palette.text_muted }
+        },
+        panelStyle() {
+            if (!this.palette) return {}
+            return {
+                backgroundColor: this.palette.surface_alt,
+                borderColor: this.palette.border,
+                color: this.palette.text,
+            }
+        },
+        winPanelStyle() {
+            if (!this.palette) return {}
+            return {
+                backgroundColor: this.palette.surface_alt,
+                borderColor: this.palette.accent,
+                color: this.palette.text,
+            }
+        },
+        primaryButtonStyle() {
+            if (!this.palette) return {}
+            return {
+                backgroundColor: this.palette.accent,
+                color: this.palette.accent_text,
+                borderColor: this.palette.accent,
+            }
+        },
+        cardTextStyle() {
+            const fs = this.settings?.font_size ?? 18
+            const ls = (this.settings?.letter_spacing ?? 0) / 100
+            const lh = (this.settings?.line_height ?? 160) / 100
+            return {
+                fontSize: fs + 'px',
+                letterSpacing: `${ls}em`,
+                lineHeight: lh,
+            }
+        },
+        checkmarkStyle() {
+            if (!this.palette) {
+                return { color: '#22c55e' }
+            }
+            return {
+                color: this.palette.accent,
+            }
+        },
+    },
+    created() {
+        this.init()
+    },
+    beforeUnmount() {
+        if (this.timerHandle) clearInterval(this.timerHandle)
+    },
+    methods: {
+        async init() {
+            await this.fetchConfig()
+            this.resetGame()
+            this.startTimer()
+        },
+        async fetchConfig() {
+            const { data: user } = await api.get('/api/user')
+            this.settings = user.user.settings
 
-// 9 pairs -> 18 cards
-const TOTAL_CARDS = 18
-const totalPairs = computed(()=> TOTAL_CARDS / 2)
+            if (this.settings && this.settings.color_palette_id) {
+                const { data: pal } = await api.get(`/api/color-palettes/${this.settings.color_palette_id}`)
+                this.palette = pal
+            }
 
-// slightly smaller cards, centered layout
-const cardMin = 'clamp(104px, 12vw, 168px)'
+            const { data: imgs } = await api.get('/api/images', { params: { type: 'card' } })
+            this.gameImages = Array.isArray(imgs) ? imgs : []
+        },
+        startTimer() {
+            if (this.timerHandle) clearInterval(this.timerHandle)
+            this.timerHandle = setInterval(() => {
+                if (!this.win) this.timer++
+            }, 1000)
+        },
+        buildDeckFromImages() {
+            const list = this.gameImages.filter(img => img.type === 'card')
+            if (!list.length) {
+                this.cards = []
+                return
+            }
 
-const cards = ref([])
-const firstPick = ref(null) // uid
-const secondPick = ref(null) // uid
-const lock = ref(false)
-const moves = ref(0)
-const matchedCount = ref(0)
-const timer = ref(0)
-let timerHandle = null
+            const byValue = new Map()
+            for (const img of list) {
+                const key = img.value
+                if (!byValue.has(key)) byValue.set(key, [])
+                byValue.get(key).push(img)
+            }
 
-const win = computed(()=> matchedCount.value === totalPairs.value)
+            const valueKeys = Array.from(byValue.keys())
+            if (!valueKeys.length) {
+                this.cards = []
+                return
+            }
 
-const timeText = computed(()=>{
-    const m = Math.floor(timer.value / 60)
-    const s = timer.value % 60
-    return m ? `${m} p ${String(s).padStart(2,'0')} mp` : `${s} mp`
-})
+            const desiredPairs = Math.min(9, valueKeys.length)
+            const chosenValues = valueKeys.slice(0, desiredPairs)
 
-watch(win, v => { if(v) announce('Játék vége.') })
+            const deck = []
+            chosenValues.forEach((val, idx) => {
+                const imgs = byValue.get(val)
+                const img = imgs[0]
 
-onMounted(()=> {
-    resetGame()
-    timerHandle = setInterval(()=> { if(!win.value) timer.value++ }, 1000)
-})
-onBeforeUnmount(()=> clearInterval(timerHandle))
+                deck.push({
+                    uid: `i-${idx}`,
+                    kind: 'image',
+                    value: val,
+                    image: img,
+                    matched: false,
+                    flipped: false,
+                    showCheck: false,
+                })
 
-function buildDeck(){
-    const needPairs = totalPairs.value
-    const faces = FACE_SET.slice(0, needPairs)
-    const deck = faces.flatMap((f,i)=> ([
-        { uid: `a-${i}`, face: f, matched: false, flipped: false },
-        { uid: `b-${i}`, face: f, matched: false, flipped: false },
-    ]))
-    for(let i = deck.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[deck[i], deck[j]] = [deck[j], deck[i]]
-    }
-    return deck
-}
+                deck.push({
+                    uid: `t-${idx}`,
+                    kind: 'text',
+                    value: val,
+                    image: null,
+                    matched: false,
+                    flipped: false,
+                    showCheck: false,
+                })
+            })
 
-function resetGame(){
-    firstPick.value = null
-    secondPick.value = null
-    lock.value = false
-    moves.value = 0
-    matchedCount.value = 0
-    timer.value = 0
-    cards.value = buildDeck()
-    announce('Új játék.')
-}
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1))
+                const tmp = deck[i]
+                deck[i] = deck[j]
+                deck[j] = tmp
+            }
 
-function onFlip(uid){
-    if(lock.value) return
-    const c = cards.value.find(x => x.uid === uid)
-    if(!c || c.matched || c.flipped) return
-    c.flipped = true
-    if(firstPick.value === null){ firstPick.value = uid; return }
-    if(secondPick.value === null){
-        secondPick.value = uid
-        moves.value++
-        checkMatch()
-    }
-}
+            this.cards = deck
+        },
+        resetGame() {
+            this.firstPick = null
+            this.secondPick = null
+            this.lock = false
+            this.moves = 0
+            this.matchedCount = 0
+            this.timer = 0
+            this.buildDeckFromImages()
+        },
+        onFlip(uid) {
+            if (this.lock || this.win) return
+            const c = this.cards.find(x => x.uid === uid)
+            if (!c || c.matched || c.flipped) return
 
-function checkMatch(){
-    const a = cards.value.find(x => x.uid === firstPick.value)
-    const b = cards.value.find(x => x.uid === secondPick.value)
-    if(!a || !b) return
-    if(a.face === b.face){
-        a.matched = b.matched = true
-        firstPick.value = secondPick.value = null
-        matchedCount.value++
-        announce('Pár megtalálva.')
-    } else {
-        lock.value = true
-        setTimeout(()=>{
-            a.flipped = false
-            b.flipped = false
-            firstPick.value = secondPick.value = null
-            lock.value = false
-        }, 600)
-    }
-}
+            c.flipped = true
 
-function isRevealed(card){ return card.flipped || card.matched }
+            if (this.firstPick === null) {
+                this.firstPick = uid
+                return
+            }
+            if (this.secondPick === null) {
+                this.secondPick = uid
+                this.moves++
+                this.checkMatch()
+            }
+        },
+        checkMatch() {
+            const a = this.cards.find(x => x.uid === this.firstPick)
+            const b = this.cards.find(x => x.uid === this.secondPick)
+            if (!a || !b) return
 
-function cardClass(card){
-    const base = 'border-neutral-800 bg-neutral-950 text-amber-400 hover:bg-neutral-900 focus:ring-4 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-neutral-900'
-    const on = 'bg-neutral-900'
-    const done = 'bg-emerald-900/30 border-emerald-600 text-emerald-300'
-    return [base, card.matched ? done : (card.flipped ? on : '')]
-}
+            if (a.value === b.value && a.uid !== b.uid) {
+                a.matched = true
+                b.matched = true
+                this.matchedCount++
+                const first = a
+                const second = b
+                this.firstPick = null
+                this.secondPick = null
 
-function ariaLabel(card){
-    if(card.matched) return `Párosítva: ${card.face}`
-    if(card.flipped) return `Felfordítva: ${card.face}`
-    return 'Lefordított kártya'
-}
-
-function announce(msg){
-    const el = document.getElementById('live')
-    if(el){ el.textContent = msg; setTimeout(()=> el.textContent = '', 1200) }
+                setTimeout(() => {
+                    first.showCheck = true
+                    second.showCheck = true
+                }, 500)
+            } else {
+                this.lock = true
+                setTimeout(() => {
+                    a.flipped = false
+                    b.flipped = false
+                    this.firstPick = null
+                    this.secondPick = null
+                    this.lock = false
+                }, 600)
+            }
+        },
+        isRevealed(card) {
+            return card.flipped || card.matched
+        },
+        cardStyle(card) {
+            if (!this.palette) return {}
+            const base = {
+                borderColor: this.palette.border,
+                backgroundColor: this.palette.surface,
+                color: this.palette.text,
+            }
+            if (card.matched) {
+                base.borderColor = this.palette.accent
+                if (card.showCheck) {
+                    base.backgroundColor = this.palette.surface_alt
+                }
+            } else if (card.flipped) {
+                base.backgroundColor = this.palette.surface_alt
+            }
+            return base
+        },
+        ariaLabel(card) {
+            if (card.matched && card.showCheck) return `Párosítva: ${card.value}`
+            if (card.flipped) {
+                return card.kind === 'image'
+                    ? `Kép: ${card.value}`
+                    : `Szöveg: ${card.value}`
+            }
+            return 'Lefordított kártya'
+        },
+        imageUrl(path) {
+            if (!path) return ''
+            return `${window.location.origin}/storage/${path}`
+        },
+    },
 }
 </script>
+
+<style scoped>
+.check-fade {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.check-fade--visible {
+    opacity: 1;
+    transform: scale(1);
+}
+</style>

@@ -402,8 +402,6 @@
                 </div>
             </div>
         </section>
-
-        <p id="live" class="sr-only" role="status" aria-live="polite"></p>
     </section>
 </template>
 
@@ -484,10 +482,6 @@ export default {
                 } catch (e) {}
             } else if (navigator.clipboard && navigator.clipboard.writeText) {
                 await navigator.clipboard.writeText(url)
-                const live = document.getElementById('live')
-                if (live) {
-                    live.textContent = 'Link vágólapra másolva.'
-                }
             }
         },
         async removeChild(id) {

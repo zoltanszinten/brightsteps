@@ -8,8 +8,11 @@ class ColorPaletteController extends Controller
 {
     public function index()
     {
-        return ColorPalette::query()
-            ->orderBy('id')
-            ->get();
+        return response()->json(ColorPalette::query()->orderBy('id')->get());
+    }
+
+    public function details(ColorPalette $colorPalette)
+    {
+        return response()->json($colorPalette);
     }
 }
