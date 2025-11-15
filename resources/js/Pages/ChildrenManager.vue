@@ -67,7 +67,7 @@
                         </button>
                         <button
                             @click="copyLink(c.id)"
-                            class="p-2 rounded-xl border border-red-600 text-red-400 hover:bg-neutral-900"
+                            class="p-2 rounded-xl border border-amber-400 text-amber-400 hover:bg-neutral-900"
                             title="Link megosztása"
                         >
                             <span class="sr-only">Link megosztása</span>

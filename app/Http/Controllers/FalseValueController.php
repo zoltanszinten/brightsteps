@@ -9,7 +9,7 @@ class FalseValueController extends Controller
 {
     public function index()
     {
-        return FalseValue::orderBy('value')->get();
+        return response()->json(FalseValue::orderBy('value')->get());
     }
 
     public function store(Request $request)

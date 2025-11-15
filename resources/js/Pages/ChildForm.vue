@@ -240,18 +240,19 @@ export default {
     },
     computed: {
         selectedPalette() {
-            const currentId = Number(this.state.color_palette_id)
-            return this.palettes.find(p => Number(p.id) === currentId) || null
+            return this.palettes.find(p => p.id === this.state.color_palette_id)
         },
         previewContainerStyle() {
             const style = {
                 width: `min(100%, ${this.state.width}px)`,
                 margin: 'auto',
             }
+
             if (this.selectedPalette) {
                 style.backgroundColor = this.selectedPalette.background
                 style.borderColor = this.selectedPalette.border
             }
+
             return style
         },
         previewStyle() {
@@ -305,6 +306,7 @@ export default {
             if (!this.selectedPalette) {
                 return {}
             }
+
             return {
                 backgroundColor: this.selectedPalette.accent,
                 color: this.selectedPalette.accent_text,
@@ -315,6 +317,7 @@ export default {
             if (!this.selectedPalette) {
                 return {}
             }
+
             return {
                 borderColor: this.selectedPalette.border,
                 color: this.selectedPalette.text,
@@ -324,6 +327,7 @@ export default {
             if (!this.selectedPalette) {
                 return {}
             }
+
             return {
                 borderColor: this.selectedPalette.accent,
                 color: this.selectedPalette.accent,
@@ -333,6 +337,7 @@ export default {
             if (!this.selectedPalette) {
                 return {}
             }
+
             return {
                 backgroundColor: this.selectedPalette.surface,
                 borderColor: this.selectedPalette.border,
@@ -356,6 +361,7 @@ export default {
         },
         async save() {
             this.saving = true
+
             const payload = { name: this.form.name, settings: { ...this.state } }
             if (this.isEdit) {
                 await api.put(`/api/child/${this.id}`, payload)
@@ -363,7 +369,9 @@ export default {
                 const { data } = await api.post(`/api/child`, payload)
                 this.id = data.id
             }
+
             this.saving = false
+
             this.$router.push({ name: 'children' })
         },
         cancel() {

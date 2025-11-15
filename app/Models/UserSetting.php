@@ -19,10 +19,6 @@ class UserSetting extends Authenticatable
     ];
 
     protected $casts = [
-        'width' => 'integer',
-        'font_size' => 'integer',
-        'letter_spacing' => 'integer',
-        'line_height' => 'integer',
         'show_card_game' => 'boolean',
         'show_recognition_game' => 'boolean',
         'show_map_game' => 'boolean',

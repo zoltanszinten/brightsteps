@@ -11,6 +11,7 @@ class Statistic extends Model
         'type',
         'points',
         'time',
+        'created_at',
     ];
 
     public function user()

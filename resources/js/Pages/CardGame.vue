@@ -17,7 +17,6 @@
                         :key="card.uid"
                         class="relative rounded-xl sm:rounded-2xl border text-center font-extrabold focus:outline-none overflow-hidden"
                         :style="cardStyle(card)"
-                        :aria-label="ariaLabel(card)"
                         @click="onFlip(card.uid)"
                     >
                         <div
@@ -58,7 +57,7 @@
                                 </template>
                                 <template v-else-if="isRevealed(card)">
                                     <img
-                                        v-if="card.kind === 'image' && card.image"
+                                        v-if="card.type === 'image' && card.image"
                                         :src="imageUrl(card.image.path || card.image.url)"
                                         :alt="card.value"
                                         class="w-full h-full object-contain"
@@ -110,9 +109,28 @@
                 <button
                     class="mt-4 px-4 py-2 rounded-xl border text-sm font-semibold"
                     :style="primaryButtonStyle"
-                    @click="resetGame"
+                    @click="nextGame"
                 >
-                    Új játék
+                    <svg
+                        viewBox="0 0 24 24"
+                        class="w-7 h-7"
+                    >
+                        <path
+                            d="M5 12h11"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                        <path
+                            d="M13 6l6 6-6 6"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
                 </button>
             </div>
         </div>
@@ -152,15 +170,17 @@ export default {
             return m ? `${m} p ${String(s).padStart(2, '0')} mp` : `${s} mp`
         },
         pageStyle() {
-            if (!this.palette) return {}
+            if (!this.palette){
+                return {}
+            }
+
             return {
                 backgroundColor: this.palette.background,
                 color: this.palette.text,
             }
         },
         cardSize() {
-            const fs = this.settings?.font_size ?? 18
-            return Math.max(140, Math.min(fs * 7, 320))
+            return Math.max(140, Math.min(this.settings?.font_size * 7, 320))
         },
         gridWrapperStyle() {
             const style = { maxWidth: '72rem', width: '100%' }
@@ -177,7 +197,10 @@ export default {
             return style
         },
         textBlockStyle() {
-            if (!this.settings) return {}
+            if (!this.settings) {
+                return {}
+            }
+
             return {
                 letterSpacing: `${(this.settings.letter_spacing ?? 0) / 100}em`,
                 lineHeight: (this.settings.line_height ?? 160) / 100,
@@ -185,11 +208,17 @@ export default {
             }
         },
         mutedTextStyle() {
-            if (!this.palette) return {}
+            if (!this.palette){
+                return {}
+            }
+
             return { color: this.palette.text_muted }
         },
         panelStyle() {
-            if (!this.palette) return {}
+            if (!this.palette){
+                return {}
+            }
+
             return {
                 backgroundColor: this.palette.surface_alt,
                 borderColor: this.palette.border,
@@ -197,7 +226,10 @@ export default {
             }
         },
         winPanelStyle() {
-            if (!this.palette) return {}
+            if (!this.palette){
+                return {}
+            }
+
             return {
                 backgroundColor: this.palette.surface_alt,
                 borderColor: this.palette.accent,
@@ -205,7 +237,10 @@ export default {
             }
         },
         primaryButtonStyle() {
-            if (!this.palette) return {}
+            if (!this.palette){
+                return {}
+            }
+
             return {
                 backgroundColor: this.palette.accent,
                 color: this.palette.accent_text,
@@ -213,19 +248,17 @@ export default {
             }
         },
         cardTextStyle() {
-            const fs = this.settings?.font_size ?? 18
-            const ls = (this.settings?.letter_spacing ?? 0) / 100
-            const lh = (this.settings?.line_height ?? 160) / 100
             return {
-                fontSize: fs + 'px',
-                letterSpacing: `${ls}em`,
-                lineHeight: lh,
+                fontSize: `${this.settings?.font_size}px`,
+                letterSpacing: `${this.settings?.letter_spacing / 100}em`,
+                lineHeight: this.settings?.line_height / 100,
             }
         },
         checkmarkStyle() {
             if (!this.palette) {
-                return { color: '#22c55e' }
+                return {}
             }
+
             return {
                 color: this.palette.accent,
             }
@@ -235,12 +268,22 @@ export default {
         this.init()
     },
     beforeUnmount() {
-        if (this.timerHandle) clearInterval(this.timerHandle)
+        if (this.timerHandle) {
+            clearInterval(this.timerHandle)
+        }
     },
     methods: {
         async init() {
             await this.fetchConfig()
-            this.resetGame()
+
+            this.firstPick = null
+            this.secondPick = null
+            this.lock = false
+            this.moves = 0
+            this.matchedCount = 0
+            this.timer = 0
+
+            this.buildDeckFromImages()
             this.startTimer()
         },
         async fetchConfig() {
@@ -256,9 +299,14 @@ export default {
             this.gameImages = Array.isArray(imgs) ? imgs : []
         },
         startTimer() {
-            if (this.timerHandle) clearInterval(this.timerHandle)
+            if (this.timerHandle){
+                clearInterval(this.timerHandle)
+            }
+
             this.timerHandle = setInterval(() => {
-                if (!this.win) this.timer++
+                if (!this.win){
+                    this.timer++
+                }
             }, 1000)
         },
         buildDeckFromImages() {
@@ -291,7 +339,7 @@ export default {
 
                 deck.push({
                     uid: `i-${idx}`,
-                    kind: 'image',
+                    type: 'image',
                     value: val,
                     image: img,
                     matched: false,
@@ -301,7 +349,7 @@ export default {
 
                 deck.push({
                     uid: `t-${idx}`,
-                    kind: 'text',
+                    type: 'text',
                     value: val,
                     image: null,
                     matched: false,
@@ -319,19 +367,25 @@ export default {
 
             this.cards = deck
         },
-        resetGame() {
-            this.firstPick = null
-            this.secondPick = null
-            this.lock = false
-            this.moves = 0
-            this.matchedCount = 0
-            this.timer = 0
-            this.buildDeckFromImages()
+        async saveStatistics() {
+            await api.post('/api/statistics', {
+                type: 'card',
+                points: this.moves,
+                time: this.timer,
+            })
+        },
+        nextGame() {
+
         },
         onFlip(uid) {
-            if (this.lock || this.win) return
+            if (this.lock || this.win){
+                return
+            }
+
             const c = this.cards.find(x => x.uid === uid)
-            if (!c || c.matched || c.flipped) return
+            if (!c || c.matched || c.flipped) {
+                return
+            }
 
             c.flipped = true
 
@@ -348,12 +402,11 @@ export default {
         checkMatch() {
             const a = this.cards.find(x => x.uid === this.firstPick)
             const b = this.cards.find(x => x.uid === this.secondPick)
-            if (!a || !b) return
-
             if (a.value === b.value && a.uid !== b.uid) {
                 a.matched = true
                 b.matched = true
                 this.matchedCount++
+
                 const first = a
                 const second = b
                 this.firstPick = null
@@ -363,27 +416,32 @@ export default {
                     first.showCheck = true
                     second.showCheck = true
                 }, 500)
+
+                if (this.win) {
+                    this.saveStatistics()
+                }
             } else {
                 this.lock = true
+
                 setTimeout(() => {
                     a.flipped = false
                     b.flipped = false
                     this.firstPick = null
                     this.secondPick = null
                     this.lock = false
-                }, 600)
+                }, 500)
             }
         },
         isRevealed(card) {
             return card.flipped || card.matched
         },
         cardStyle(card) {
-            if (!this.palette) return {}
             const base = {
                 borderColor: this.palette.border,
                 backgroundColor: this.palette.surface,
                 color: this.palette.text,
             }
+
             if (card.matched) {
                 base.borderColor = this.palette.accent
                 if (card.showCheck) {
@@ -392,19 +450,10 @@ export default {
             } else if (card.flipped) {
                 base.backgroundColor = this.palette.surface_alt
             }
+
             return base
         },
-        ariaLabel(card) {
-            if (card.matched && card.showCheck) return `Párosítva: ${card.value}`
-            if (card.flipped) {
-                return card.kind === 'image'
-                    ? `Kép: ${card.value}`
-                    : `Szöveg: ${card.value}`
-            }
-            return 'Lefordított kártya'
-        },
         imageUrl(path) {
-            if (!path) return ''
             return `${window.location.origin}/storage/${path}`
         },
     },

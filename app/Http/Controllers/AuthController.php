@@ -23,14 +23,12 @@ class AuthController extends Controller
         return response()->json(['token' => $token]);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
-        return response()->json(['message' => 'Logged out']);
+        return response()->json(['status' => 'ok']);
     }
 
-    public function token($id){
-        $token = User::where('id', $id)->first()->createToken('api-token')->plainTextToken;
-
-        return response()->json(['token' => $token]);
+    public function token(User $user){
+        return response()->json(['token' => $user->createToken('api-token')->plainTextToken]);
     }
 }

@@ -9,6 +9,14 @@ class ColorPalette extends Authenticatable
     protected $fillable = [
         'name',
         'value',
+        'background',
+        'surface',
+        'surface_alt',
+        'text',
+        'text_muted',
+        'accent',
+        'accent_text',
+        'border',
     ];
 
     public function userSettings()

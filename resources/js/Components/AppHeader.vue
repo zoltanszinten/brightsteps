@@ -7,7 +7,7 @@
             <div class="flex items-center gap-4">
                 <span v-if="isLoggedIn" class="text-sm text-amber-400">{{ displayName }}</span>
                 <button v-if="isLoggedIn"
-                        class="px-4 py-3 rounded-2xl border text-amber-400 border-amber-400 hover:bg-slate-900"
+                        class="px-4 py-3 rounded-2xl border text-amber-400 border-amber-400 hover:bg-neutral-900"
                         @click="logout">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
                          stroke="currentColor" stroke-width="2">

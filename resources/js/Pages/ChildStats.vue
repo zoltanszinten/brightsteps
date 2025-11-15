@@ -3,143 +3,269 @@
         <header class="flex items-center justify-between mb-6">
             <div>
                 <h1 class="text-2xl font-extrabold tracking-widest text-amber-400">Statisztikák</h1>
-                <p class="text-neutral-300">Gyermek: <span class="font-semibold text-neutral-100">Kis Feri</span></p>
+                <p class="text-neutral-300">
+                    Gyermek:
+                    <span class="font-semibold text-neutral-100">
+                        {{child.name }}
+                    </span>
+                </p>
+                <p v-if="lastSession">
+                    Utolsó játék:
+                    <span class="text-neutral-100 font-semibold">
+                        {{ formatDateTime(lastSession.created_at) }}
+                    </span>
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button
+                    type="button"
+                    @click="cancel"
+                    class="px-3 py-2 rounded-xl border border-neutral-700 text-neutral-300 hover:bg-neutral-900"
+                >
+                    Vissza
+                </button>
             </div>
         </header>
 
-        <!-- KPI cards -->
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Összes feladat</p>
-                <p class="text-2xl font-bold text-neutral-100">15</p>
+                <p class="text-neutral-400 text-sm">Összes játék</p>
+                <p class="text-2xl font-bold text-neutral-100">{{ totalSessions }}</p>
             </div>
             <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Átlag pontszám</p>
-                <p class="text-2xl font-bold text-neutral-100">82%</p>
+                <p class="text-neutral-400 text-sm">Átlag lépés</p>
+                <p class="text-2xl font-bold text-neutral-100">
+                    {{ averagePointsDisplay }}
+                </p>
             </div>
             <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Pontosság</p>
-                <p class="text-2xl font-bold text-neutral-100">88%</p>
+                <p class="text-neutral-400 text-sm">Átlag idő</p>
+                <p class="text-2xl font-bold text-neutral-100">
+                    {{ averageTimeDisplay }}
+                </p>
             </div>
             <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Közepes reakcióidő</p>
-                <p class="text-2xl font-bold text-neutral-100">1 p 20 mp</p>
+                <p class="text-neutral-400 text-sm">Legjobb lépés</p>
+                <p class="text-2xl font-bold text-neutral-100">
+                    {{ bestPointsDisplay }}
+                </p>
             </div>
         </div>
 
-        <!-- Game-type breakdown -->
         <div class="grid lg:grid-cols-3 gap-4 mb-6">
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm mb-1">Kártya</p>
-                <p class="text-xl font-bold text-neutral-100">7 alkalom</p>
-                <div class="mt-3 grid grid-cols-3 gap-3 text-sm">
-                    <div><p class="text-neutral-400">Átlag</p><p class="font-semibold">85%</p></div>
-                    <div><p class="text-neutral-400">Pontosság</p><p class="font-semibold">90%</p></div>
-                    <div><p class="text-neutral-400">Idő</p><p class="font-semibold">1 p 10 mp</p></div>
-                </div>
-                <div class="mt-4">
-                    <svg viewBox="0 0 100 30" class="w-full h-16">
-                        <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,20 20,15 40,18 60,10 80,12 100,8" class="text-amber-400"/>
-                    </svg>
-                </div>
-            </div>
-
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm mb-1">Képfelismerés</p>
-                <p class="text-xl font-bold text-neutral-100">5 alkalom</p>
-                <div class="mt-3 grid grid-cols-3 gap-3 text-sm">
-                    <div><p class="text-neutral-400">Átlag</p><p class="font-semibold">78%</p></div>
-                    <div><p class="text-neutral-400">Pontosság</p><p class="font-semibold">83%</p></div>
-                    <div><p class="text-neutral-400">Idő</p><p class="font-semibold">1 p 35 mp</p></div>
-                </div>
-                <div class="mt-4">
-                    <svg viewBox="0 0 100 30" class="w-full h-16">
-                        <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,22 20,24 40,20 60,18 80,16 100,14" class="text-amber-400"/>
-                    </svg>
-                </div>
-            </div>
-
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm mb-1">Térkép</p>
-                <p class="text-xl font-bold text-neutral-100">3 alkalom</p>
-                <div class="mt-3 grid grid-cols-3 gap-3 text-sm">
-                    <div><p class="text-neutral-400">Átlag</p><p class="font-semibold">76%</p></div>
-                    <div><p class="text-neutral-400">Pontosság</p><p class="font-semibold">81%</p></div>
-                    <div><p class="text-neutral-400">Idő</p><p class="font-semibold">1 p 55 mp</p></div>
-                </div>
-                <div class="mt-4">
-                    <svg viewBox="0 0 100 30" class="w-full h-16">
-                        <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,26 20,22 40,24 60,20 80,18 100,16" class="text-amber-400"/>
-                    </svg>
+            <div
+                v-for="t in perType"
+                :key="t.type"
+                class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4"
+            >
+                <p class="text-neutral-400 text-sm mb-1">{{ t.label }}</p>
+                <p class="text-xl font-bold text-neutral-100">
+                    {{ t.count }} alkalom
+                </p>
+                <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-neutral-400">Átlag lépés</p>
+                        <p class="font-semibold">
+                            {{ formatPercent(t.avgPoints) }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-neutral-400">Átlag idő</p>
+                        <p class="font-semibold">
+                            {{ formatDuration(t.avgTime) }}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sessions table -->
         <div class="rounded-2xl border border-neutral-800 bg-neutral-950 overflow-hidden">
-            <div class="px-4 py-3 border-b border-neutral-800 flex items-center gap-3">
-                <label class="text-sm text-neutral-300">Szűrés:</label>
-                <select class="rounded-xl px-2 py-2 border border-neutral-700 bg-neutral-900 text-neutral-200 text-sm">
-                    <option>Összes</option>
-                    <option>Kártya</option>
-                    <option>Képfelismerés</option>
-                    <option>Térkép</option>
-                </select>
-                <select class="rounded-xl px-2 py-2 border border-neutral-700 bg-neutral-900 text-neutral-200 text-sm">
-                    <option>Utolsó 30 nap</option>
-                    <option>Utolsó 7 nap</option>
-                    <option>Mind</option>
+            <div class="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
+                <p class="text-sm text-neutral-300">Játékok listája</p>
+                <select
+                    v-model="filterType"
+                    class="rounded-xl px-2 py-2 border border-neutral-700 bg-neutral-900 text-neutral-200 text-sm"
+                >
+                    <option value="all">Összes</option>
+                    <option value="card">Kártya játék</option>
+                    <option value="recognition">Képfelismerés</option>
+                    <option value="map">Térkép</option>
                 </select>
             </div>
 
             <div class="grid grid-cols-12 px-4 py-2 text-sm text-neutral-400 border-b border-neutral-800">
-                <div class="col-span-3">Dátum</div>
-                <div class="col-span-2">Modul</div>
+                <div class="col-span-4">Dátum</div>
+                <div class="col-span-3">Modul</div>
                 <div class="col-span-2">Pontszám</div>
-                <div class="col-span-2">Pontosság</div>
                 <div class="col-span-2">Idő</div>
-                <div class="col-span-1 text-right">Részlet</div>
+                <div class="col-span-1 text-right">#</div>
             </div>
 
-            <!-- Static rows -->
-            <div class="grid grid-cols-12 px-4 py-3 border-b border-neutral-900 items-center">
-                <div class="col-span-3 text-neutral-300">2025.10.10. 14:32</div>
-                <div class="col-span-2 text-neutral-300">Kártya</div>
-                <div class="col-span-2 text-neutral-100 font-semibold">88%</div>
-                <div class="col-span-2 text-neutral-300">92%</div>
-                <div class="col-span-2 text-neutral-300">1 p 05 mp</div>
-                <div class="col-span-1 text-right">
-                    <button class="px-2 py-1 rounded-lg border border-neutral-700 text-neutral-200 text-xs">Részletek</button>
+            <div
+                v-if="filteredStats.length === 0"
+                class="px-4 py-4 text-neutral-300 text-sm"
+            >
+                Nincs statisztika a kiválasztott szűrővel.
+            </div>
+
+            <div
+                v-for="s in filteredStats"
+                :key="s.id"
+                class="grid grid-cols-12 px-4 py-3 border-b border-neutral-900 items-center"
+            >
+                <div class="col-span-4 text-neutral-300">
+                    {{ formatDateTime(s.created_at) }}
                 </div>
-            </div>
-
-            <div class="grid grid-cols-12 px-4 py-3 border-b border-neutral-900 items-center">
-                <div class="col-span-3 text-neutral-300">2025.10.08. 09:12</div>
-                <div class="col-span-2 text-neutral-300">Képfelismerés</div>
-                <div class="col-span-2 text-neutral-100 font-semibold">79%</div>
-                <div class="col-span-2 text-neutral-300">84%</div>
-                <div class="col-span-2 text-neutral-300">1 p 42 mp</div>
-                <div class="col-span-1 text-right">
-                    <button class="px-2 py-1 rounded-lg border border-neutral-700 text-neutral-200 text-xs">Részletek</button>
+                <div class="col-span-3 text-neutral-300">
+                    {{ typeLabel(s.type) }}
                 </div>
-            </div>
-
-            <div class="grid grid-cols-12 px-4 py-3 items-center">
-                <div class="col-span-3 text-neutral-300">2025.10.05. 16:20</div>
-                <div class="col-span-2 text-neutral-300">Térkép</div>
-                <div class="col-span-2 text-neutral-100 font-semibold">75%</div>
-                <div class="col-span-2 text-neutral-300">80%</div>
-                <div class="col-span-2 text-neutral-300">2 p 01 mp</div>
-                <div class="col-span-1 text-right">
-                    <button class="px-2 py-1 rounded-lg border border-neutral-700 text-neutral-200 text-xs">Részletek</button>
+                <div class="col-span-2 text-neutral-100 font-semibold">
+                    {{ formatPercent(s.points) }}
+                </div>
+                <div class="col-span-2 text-neutral-300">
+                    {{ formatDuration(s.time) }}
+                </div>
+                <div class="col-span-1 text-right text-xs text-neutral-500">
+                    #{{ s.id }}
                 </div>
             </div>
         </div>
-
-        <p id="live" class="sr-only" role="status" aria-live="polite"></p>
     </section>
 </template>
 
-<script setup>
-// intentionally empty: display-only
+<script>
+import api from '../api'
+
+const TYPE_LABELS = {
+    card: 'Kártya játék',
+    recognition: 'Képfelismerés',
+    map: 'Térkép',
+}
+
+export default {
+    name: 'Statistics',
+    data() {
+        return {
+            id: this.$route.params.id,
+            child: null,
+            stats: [],
+            filterType: 'all',
+        }
+    },
+    created() {
+        this.fetchChild()
+        this.fetchStats()
+    },
+    computed: {
+        sortedStats() {
+            return [...this.stats].sort(
+                (a, b) => new Date(b.created_at) - new Date(a.created_at)
+            )
+        },
+        filteredStats() {
+            if (this.filterType === 'all') {
+                return this.sortedStats
+            }
+
+            return this.sortedStats.filter(s => s.type === this.filterType)
+        },
+        totalSessions() {
+            return this.stats.length
+        },
+        lastSession() {
+            return this.sortedStats[0] || null
+        },
+        averagePoints() {
+            if (!this.stats.length) return 0
+            const sum = this.stats.reduce((acc, s) => acc + (s.points || 0), 0)
+            return sum / this.stats.length
+        },
+        averagePointsDisplay() {
+            return this.stats.length ? this.formatPercent(this.averagePoints) : '–'
+        },
+        bestPoints() {
+            if (!this.stats.length) return 0
+            return this.stats.reduce((max, s) => Math.max(max, s.points || 0), 0)
+        },
+        bestPointsDisplay() {
+            return this.stats.length ? this.formatPercent(this.bestPoints) : '–'
+        },
+        averageTime() {
+            if (!this.stats.length) return 0
+            const sum = this.stats.reduce((acc, s) => acc + (s.time || 0), 0)
+            return sum / this.stats.length
+        },
+        averageTimeDisplay() {
+            return this.stats.length ? this.formatDuration(this.averageTime) : '–'
+        },
+        perType() {
+            const types = ['card', 'recognition', 'map']
+            return types.map(type => {
+                const list = this.stats.filter(s => s.type === type)
+                const count = list.length
+                let avgPoints = 0
+                let avgTime = 0
+                if (count) {
+                    const sumPoints = list.reduce((acc, s) => acc + (s.points || 0), 0)
+                    const sumTime = list.reduce((acc, s) => acc + (s.time || 0), 0)
+                    avgPoints = sumPoints / count
+                    avgTime = sumTime / count
+                }
+                return {
+                    type,
+                    label: TYPE_LABELS[type],
+                    count,
+                    avgPoints,
+                    avgTime,
+                }
+            })
+        },
+    },
+    methods: {
+        async fetchChild() {
+            if (!this.id) return
+            const { data } = await api.get(`/api/child/${this.id}`)
+            this.child = data
+        },
+        async fetchStats() {
+            if (!this.id) return
+            const { data } = await api.get(`/api/statistics/${this.id}`)
+            this.stats = Array.isArray(data) ? data : []
+        },
+        typeLabel(type) {
+            return TYPE_LABELS[type] || type
+        },
+        formatPercent(value) {
+            if (value === null || value === undefined || isNaN(value)) return '–'
+            const n = Math.round(Number(value))
+            return `${n}`
+        },
+        formatDuration(seconds) {
+            const s = Math.round(Number(seconds) || 0)
+            const m = Math.floor(s / 60)
+            const rest = s % 60
+            if (!m) {
+                return `${rest} mp`
+            }
+            return `${m} p ${String(rest).padStart(2, '0')} mp`
+        },
+        formatDateTime(isoString) {
+            if (!isoString) return ''
+            const d = new Date(isoString)
+            return d.toLocaleString('hu-HU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            })
+        },
+        cancel() {
+            this.$router.push({ name: 'children' })
+        },
+    },
+}
 </script>
+
+<style scoped>
+</style>

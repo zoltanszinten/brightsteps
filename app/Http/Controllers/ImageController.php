@@ -18,7 +18,7 @@ class ImageController extends Controller
             $query->where('type', $type);
         }
 
-        return $query->orderByDesc('id')->get();
+        return response()->json($query->orderByDesc('id')->get());
     }
 
     public function store(Request $request)

@@ -28,12 +28,3 @@ class AdminUserSeeder extends Seeder
         $user->assignRole($adminRole);
     }
 }
-
-function SchemaHasColumn(string $table, string $column): bool
-{
-    try {
-        return \Illuminate\Support\Facades\Schema::hasColumn($table, $column);
-    } catch (\Throwable $e) {
-        return false;
-    }
-}
