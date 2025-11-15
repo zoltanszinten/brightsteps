@@ -8,7 +8,7 @@ class ColorPaletteController extends Controller
 {
     public function index()
     {
-        return ColorPalette::select('id', 'name', 'value')
+        return ColorPalette::query()
             ->orderBy('id')
             ->get();
     }
