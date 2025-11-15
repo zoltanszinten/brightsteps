@@ -2,7 +2,7 @@
     <section class="container mx-auto px-4 py-8">
         <header class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-extrabold tracking-widest text-amber-400">Gyerekek kezelése</h1>
-            <button @click="createChild()" class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400">
+            <button @click="createChild()" class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400 hover:bg-neutral-900">
                 Új gyerek
             </button>
         </header>
@@ -14,10 +14,15 @@
                 <div class="col-span-5 text-right">Műveletek</div>
             </div>
 
-            <div v-if="children.length === 0" class="px-4 py-6 text-neutral-300">Nincs gyerek felvéve.</div>
+            <div v-if="children.length === 0" class="px-4 py-6 text-neutral-300">
+                Nincs gyerek felvéve.
+            </div>
 
-            <div v-for="c in children" :key="c.id"
-                 class="grid grid-cols-12 px-4 py-3 border-b border-neutral-900 items-center">
+            <div
+                v-for="c in children"
+                :key="c.id"
+                class="grid grid-cols-12 px-4 py-3 border-b border-neutral-900 items-center"
+            >
                 <div class="col-span-4 truncate">
                     <span class="font-semibold text-neutral-100">{{ c.name }}</span>
                 </div>
@@ -62,10 +67,10 @@
                         </button>
                         <button
                             @click="copyLink(c.id)"
-                            class="p-2 rounded-xl border border-amber-400 text-amber-400 hover:bg-neutral-900"
-                            title="Link másolása"
+                            class="p-2 rounded-xl border border-red-600 text-red-400 hover:bg-neutral-900"
+                            title="Link megosztása"
                         >
-                            <span class="sr-only">Link másolása</span>
+                            <span class="sr-only">Link megosztása</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24">
                                 <path
                                     d="M12 3V15"
@@ -121,49 +126,476 @@
                 </div>
             </div>
         </div>
+
+        <section class="mt-10">
+            <h2 class="text-xl font-extrabold tracking-widest text-amber-400 mb-4">Képek kezelése</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="rounded-3xl border border-neutral-800 bg-neutral-950 p-4 flex flex-col gap-4">
+                    <h3 class="text-lg font-semibold text-amber-400">Kártyajáték</h3>
+                    <form @submit.prevent="uploadImage('card')" class="space-y-3">
+                        <div>
+                            <label class="block text-sm text-neutral-300 mb-1">Érték</label>
+                            <input
+                                v-model="newCardValue"
+                                type="text"
+                                class="w-full rounded-xl px-3 py-2 border border-neutral-700 bg-neutral-900 text-neutral-100"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm text-neutral-300 mb-1">Kép</label>
+                            <input type="file" accept="image/*" @change="handleFileChange('card', $event)"
+                                   class="w-full text-sm text-neutral-300"/>
+                        </div>
+                        <button
+                            type="submit"
+                            class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400 w-full text-sm hover:bg-neutral-900"
+                        >
+                            Feltöltés
+                        </button>
+                    </form>
+                    <div class="border-t border-neutral-800 pt-3">
+                        <h4 class="text-sm text-neutral-400 mb-2">Létező képek</h4>
+                        <div v-if="imagesCard.length === 0" class="text-xs text-neutral-500">
+                            Nincs kép feltöltve.
+                        </div>
+                        <div v-else class="space-y-2 max-h-64 overflow-y-auto">
+                            <div
+                                v-for="img in imagesCard"
+                                :key="img.id"
+                                class="flex items-center gap-3"
+                            >
+                                <div class="w-12 h-12 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex-shrink-0">
+                                    <img
+                                        v-if="imageUrl(img.path)"
+                                        :src="imageUrl(img.path)"
+                                        alt=""
+                                        class="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs text-neutral-200 truncate">{{ img.value }}</div>
+                                    <div class="text-[10px] text-neutral-500 truncate">{{ img.original_name }}</div>
+                                </div>
+                                <button
+                                    @click="deleteImage('card', img)"
+                                    class="p-1 rounded-lg border border-red-600 text-red-400 hover:bg-neutral-900"
+                                    title="Törlés"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24">
+                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        <path
+                                            d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                        />
+                                        <path
+                                            d="M8 7L9 20H15L16 7"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-3xl border border-neutral-800 bg-neutral-950 p-4 flex flex-col gap-4">
+                    <h3 class="text-lg font-semibold text-amber-400">Képfelismerés</h3>
+                    <form @submit.prevent="uploadImage('recognition')" class="space-y-3">
+                        <div>
+                            <label class="block text-sm text-neutral-300 mb-1">Érték</label>
+                            <input
+                                v-model="newRecognitionValue"
+                                type="text"
+                                class="w-full rounded-xl px-3 py-2 border border-neutral-700 bg-neutral-900 text-neutral-100"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm text-neutral-300 mb-1">Kép</label>
+                            <input type="file" accept="image/*" @change="handleFileChange('recognition', $event)"
+                                   class="w-full text-sm text-neutral-300"/>
+                        </div>
+                        <button
+                            type="submit"
+                            class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400 w-full text-sm hover:bg-neutral-900"
+                        >
+                            Feltöltés
+                        </button>
+                    </form>
+                    <div class="border-t border-neutral-800 pt-3 mb-4">
+                        <h4 class="text-sm text-neutral-400 mb-2">Létező képek</h4>
+                        <div v-if="imagesRecognition.length === 0" class="text-xs text-neutral-500">
+                            Nincs kép feltöltve.
+                        </div>
+                        <div v-else class="space-y-2 max-h-64 overflow-y-auto">
+                            <div
+                                v-for="img in imagesRecognition"
+                                :key="img.id"
+                                class="flex items-center gap-3"
+                            >
+                                <div class="w-12 h-12 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex-shrink-0">
+                                    <img
+                                        v-if="imageUrl(img.path)"
+                                        :src="imageUrl(img.path)"
+                                        alt=""
+                                        class="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs text-neutral-200 truncate">{{ img.value }}</div>
+                                    <div class="text-[10px] text-neutral-500 truncate">{{ img.original_name }}</div>
+                                </div>
+                                <button
+                                    @click="deleteImage('recognition', img)"
+                                    class="p-1 rounded-lg border border-red-600 text-red-400 hover:bg-neutral-900"
+                                    title="Törlés"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24">
+                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        <path
+                                            d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                        />
+                                        <path
+                                            d="M8 7L9 20H15L16 7"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-neutral-800 pt-3">
+                        <h4 class="text-sm text-neutral-400 mb-2">Hamis értékek</h4>
+                        <form @submit.prevent="createFalseValue" class="flex gap-2 mb-3">
+                            <input
+                                v-model="newFalseValue"
+                                type="text"
+                                placeholder="Új hamis érték"
+                                class="flex-1 rounded-xl px-3 py-2 border border-neutral-700 bg-neutral-900 text-neutral-100 text-sm"
+                            />
+                            <button
+                                type="submit"
+                                class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400 text-sm hover:bg-neutral-900"
+                            >
+                                +
+                            </button>
+                        </form>
+                        <div v-if="recognitionFalseValues.length === 0" class="text-xs text-neutral-500">
+                            Nincs hamis érték felvéve.
+                        </div>
+                        <div v-else class="space-y-1 max-h-40 overflow-y-auto">
+                            <div
+                                v-for="fv in recognitionFalseValues"
+                                :key="fv.id"
+                                class="flex items-center justify-between gap-2 text-xs text-neutral-200 bg-neutral-900 border border-neutral-800 rounded-lg px-2 py-1"
+                            >
+                                <span class="truncate">{{ fv.value }}</span>
+                                <button
+                                    @click="deleteFalseValue(fv)"
+                                    class="p-1 rounded-lg border border-red-600 text-red-400 hover:bg-neutral-800"
+                                    title="Törlés"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24">
+                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        <path
+                                            d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                        />
+                                        <path
+                                            d="M8 7L9 20H15L16 7"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-3xl border border-neutral-800 bg-neutral-950 p-4 flex flex-col gap-4">
+                    <h3 class="text-lg font-semibold text-amber-400">Térkép</h3>
+                    <form @submit.prevent="uploadImage('map')" class="space-y-3">
+                        <div>
+                            <label class="block text-sm text-neutral-300 mb-1">Érték</label>
+                            <input
+                                v-model="newMapValue"
+                                type="text"
+                                class="w-full rounded-xl px-3 py-2 border border-neutral-700 bg-neutral-900 text-neutral-100"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm text-neutral-300 mb-1">Kép</label>
+                            <input type="file" accept="image/*" @change="handleFileChange('map', $event)"
+                                   class="w-full text-sm text-neutral-300"/>
+                        </div>
+                        <button
+                            type="submit"
+                            class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400 w-full text-sm hover:bg-neutral-900"
+                        >
+                            Feltöltés
+                        </button>
+                    </form>
+                    <div class="border-t border-neutral-800 pt-3">
+                        <h4 class="text-sm text-neutral-400 mb-2">Létező képek</h4>
+                        <div v-if="imagesMap.length === 0" class="text-xs text-neutral-500">
+                            Nincs kép feltöltve.
+                        </div>
+                        <div v-else class="space-y-2 max-h-64 overflow-y-auto">
+                            <div
+                                v-for="img in imagesMap"
+                                :key="img.id"
+                                class="flex items-center gap-3"
+                            >
+                                <div class="w-12 h-12 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex-shrink-0">
+                                    <img
+                                        v-if="imageUrl(img.path)"
+                                        :src="imageUrl(img.path)"
+                                        alt=""
+                                        class="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs text-neutral-200 truncate">{{ img.value }}</div>
+                                    <div class="text-[10px] text-neutral-500 truncate">{{ img.original_name }}</div>
+                                </div>
+                                <button
+                                    @click="deleteImage('map', img)"
+                                    class="p-1 rounded-lg border border-red-600 text-red-400 hover:bg-neutral-900"
+                                    title="Törlés"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24">
+                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        <path
+                                            d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                        />
+                                        <path
+                                            d="M8 7L9 20H15L16 7"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <p id="live" class="sr-only" role="status" aria-live="polite"></p>
     </section>
 </template>
 
 <script>
 import api from '../api'
-import { formatDate } from '@/utils/dateFormatter'
+
+const dateFormatter = new Intl.DateTimeFormat('hu-HU', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+})
 
 export default {
     name: 'ChildrenManager',
     data() {
         return {
             children: [],
+            imagesCard: [],
+            imagesRecognition: [],
+            imagesMap: [],
+            recognitionFalseValues: [],
+            newCardValue: '',
+            newRecognitionValue: '',
+            newMapValue: '',
+            newFalseValue: '',
+            newCardFile: null,
+            newRecognitionFile: null,
+            newMapFile: null,
         }
     },
     mounted() {
         this.fetchChildren()
+        this.fetchImages('card')
+        this.fetchImages('recognition')
+        this.fetchImages('map')
+        this.fetchFalseValues()
     },
     methods: {
-        formatDate,
         async fetchChildren() {
-            const {data} = await api.get('/api/children')
-            this.children = data.children
+            const { data } = await api.get('/api/children')
+            this.children = data
+        },
+        formatDate(value) {
+            if (!value) {
+                return ''
+            }
+            const date = new Date(value)
+            if (Number.isNaN(date.getTime())) {
+                return String(value)
+            }
+            return dateFormatter.format(date)
         },
         gotoStatistics(id) {
-            this.$router.push({name: 'statistics', params: {id}})
+            this.$router.push({ name: 'statistics', params: { id } })
         },
         gotoEdit(id) {
-            this.$router.push({name: 'child-edit', params: {id}})
+            this.$router.push({ name: 'child-edit', params: { id } })
         },
         createChild() {
-            this.$router.push({name: 'child-new'})
+            this.$router.push({ name: 'child-new' })
         },
         async copyLink(id) {
-            const {data} = await api.get(`/api/token/${id}`)
+            const { data } = await api.get(`/api/token/${id}`)
             const token = data.token
-            if (token) {
-                const url = `${window.location.origin}/?token=${encodeURIComponent(token)}`
+            if (!token) {
+                return
+            }
+            const url = `${window.location.origin}/?token=${encodeURIComponent(token)}`
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'BrightSteps',
+                        text: 'Megosztott játék link.',
+                        url,
+                    })
+                } catch (e) {}
+            } else if (navigator.clipboard && navigator.clipboard.writeText) {
                 await navigator.clipboard.writeText(url)
+                const live = document.getElementById('live')
+                if (live) {
+                    live.textContent = 'Link vágólapra másolva.'
+                }
             }
         },
         async removeChild(id) {
             await api.delete(`/api/child/${id}`)
-            await this.fetchChildren()
+            this.children = this.children.filter(c => c.id !== id)
+        },
+        handleFileChange(type, event) {
+            const file = event.target.files && event.target.files[0] ? event.target.files[0] : null
+            if (type === 'card') {
+                this.newCardFile = file
+            } else if (type === 'recognition') {
+                this.newRecognitionFile = file
+            } else if (type === 'map') {
+                this.newMapFile = file
+            }
+        },
+        async fetchImages(type) {
+            const { data } = await api.get('/api/game-images', { params: { type } })
+            if (type === 'card') {
+                this.imagesCard = data
+            } else if (type === 'recognition') {
+                this.imagesRecognition = data
+            } else if (type === 'map') {
+                this.imagesMap = data
+            }
+        },
+        async uploadImage(type) {
+            let value
+            let file
+            if (type === 'card') {
+                value = this.newCardValue
+                file = this.newCardFile
+                if (!value || !file) {
+                    return
+                }
+            } else if (type === 'recognition') {
+                value = this.newRecognitionValue
+                file = this.newRecognitionFile
+                if (!value || !file) {
+                    return
+                }
+            } else if (type === 'map') {
+                value = this.newMapValue
+                file = this.newMapFile
+                if (!value || !file) {
+                    return
+                }
+            }
+
+            const formData = new FormData()
+            formData.append('type', type)
+            formData.append('value', value)
+            formData.append('image', file)
+
+            try {
+                const { data } = await api.post('/api/game-images', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                })
+                if (type === 'card') {
+                    this.imagesCard.unshift(data)
+                    this.newCardValue = ''
+                    this.newCardFile = null
+                } else if (type === 'recognition') {
+                    this.imagesRecognition.unshift(data)
+                    this.newRecognitionValue = ''
+                    this.newRecognitionFile = null
+                } else if (type === 'map') {
+                    this.imagesMap.unshift(data)
+                    this.newMapValue = ''
+                    this.newMapFile = null
+                }
+            } catch (e) {}
+        },
+        async deleteImage(type, image) {
+            await api.delete(`/api/game-images/${image.id}`)
+            if (type === 'card') {
+                this.imagesCard = this.imagesCard.filter(i => i.id !== image.id)
+            } else if (type === 'recognition') {
+                this.imagesRecognition = this.imagesRecognition.filter(i => i.id !== image.id)
+            } else if (type === 'map') {
+                this.imagesMap = this.imagesMap.filter(i => i.id !== image.id)
+            }
+        },
+        imageUrl(path) {
+            if (!path) {
+                return ''
+            }
+            return `${window.location.origin}/storage/${path}`
+        },
+        async fetchFalseValues() {
+            const { data } = await api.get('/api/recognition-false-values')
+            this.recognitionFalseValues = data
+        },
+        async createFalseValue() {
+            if (!this.newFalseValue) {
+                return
+            }
+            try {
+                const { data } = await api.post('/api/recognition-false-values', {
+                    value: this.newFalseValue,
+                })
+                this.recognitionFalseValues.push(data)
+                this.newFalseValue = ''
+            } catch (e) {}
+        },
+        async deleteFalseValue(item) {
+            await api.delete(`/api/recognition-false-values/${item.id}`)
+            this.recognitionFalseValues = this.recognitionFalseValues.filter(v => v.id !== item.id)
         },
     },
 }

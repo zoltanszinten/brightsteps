@@ -30,11 +30,7 @@ class UserController extends Controller
 
     public function children()
     {
-        $children = User::where('type', 'token')->get();
-
-        return response()->json([
-            'children' => $children,
-        ]);
+        return response()->json(User::where('type', 'token')->get());
     }
 
     public function childCreate(Request $request)
@@ -74,23 +70,23 @@ class UserController extends Controller
             'show_map_game' => $settings['show_map_game'] ?? true,
         ]);
 
-        return response()->json([
-            'child' => $child->load('setting'),
-        ], 201);
+        return response()->json($child->load('setting'), 201);
     }
 
-    public function childDetail($id)
+    public function childDetail(User $child)
     {
-        $child = User::where('type', 'token')->findOrFail($id);
+        if ($child->type !== 'token') {
+           return response()->json(['message' => 'Not Found'], 404);
+        }
 
-        return response()->json([
-            'child' => $child->load('setting'),
-        ]);
+        return response()->json($child->load('setting'));
     }
 
-    public function childUpdate(Request $request, $id)
+    public function childUpdate(Request $request, User $child)
     {
-        $child = User::where('type', 'token')->findOrFail($id);
+        if ($child->type !== 'token') {
+            return response()->json(['message' => 'Not Found'], 404);
+        }
 
         $request->validate([
             'name' => 'sometimes|required|string|max:255',
@@ -112,20 +108,18 @@ class UserController extends Controller
 
         $child->setting->update($request->input('settings'));
 
-        return response()->json([
-            'child' => $child->load('setting'),
-        ]);
+        return response()->json($child->load('setting'));
     }
 
-    public function childDelete($id)
+    public function childDelete(User $child)
     {
-        $child = User::where('type', 'token')->findOrFail($id);
+        if ($child->type !== 'token') {
+            return response()->json(['message' => 'Not Found'], 404);
+        }
 
         $child->setting()->delete();
         $child->delete();
 
-        return response()->json([
-            'message' => 'Child user and settings are deleted successfully.',
-        ]);
+        return response()->json(['status' => 'ok']);
     }
 }

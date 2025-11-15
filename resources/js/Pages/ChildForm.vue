@@ -6,10 +6,10 @@
             </h1>
             <div class="flex items-center gap-2">
                 <button type="button" @click="cancel"
-                        class="px-3 py-2 rounded-xl border border-neutral-700 text-neutral-300">Mégse
+                        class="px-3 py-2 rounded-xl border border-neutral-700 text-neutral-300 hover:bg-neutral-900">Mégse
                 </button>
                 <button type="button" @click="save" :disabled="saving"
-                        class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400">
+                        class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400 hover:bg-neutral-900">
                     Mentés
                 </button>
             </div>
@@ -172,10 +172,9 @@ export default {
         },
         async fetchChild() {
             const {data} = await api.get(`/api/child/${this.id}`)
-            this.form.name = data.child.name
-            if (data.child.setting) {
-                console.log(this.state, data.child.setting)
-                this.state = data.child.setting
+            this.form.name = data.name
+            if (data.setting) {
+                this.state = data.setting
             }
         },
         async save() {
