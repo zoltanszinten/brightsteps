@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GameImage;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class GameImageController extends Controller
+class ImageController extends Controller
 {
     public function index(Request $request)
     {
         $type = $request->query('type');
 
-        $query = GameImage::query();
+        $query = Image::query();
 
         if ($type) {
             $query->where('type', $type);
@@ -31,9 +31,9 @@ class GameImageController extends Controller
 
         $file = $request->file('image');
 
-        $path = $file->store('game-images', 'public');
+        $path = $file->store('images', 'public');
 
-        $image = GameImage::create([
+        $image = Image::create([
             'type' => $request->input('type'),
             'value' => $request->input('value'),
             'path' => $path,
@@ -45,7 +45,7 @@ class GameImageController extends Controller
         return response()->json($image, 201);
     }
 
-    public function destroy(GameImage $gameImage)
+    public function destroy(Image $gameImage)
     {
         if ($gameImage->path) {
             Storage::disk('public')->delete($gameImage->path);

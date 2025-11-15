@@ -291,12 +291,12 @@
                                 +
                             </button>
                         </form>
-                        <div v-if="recognitionFalseValues.length === 0" class="text-xs text-neutral-500">
+                        <div v-if="falseValues.length === 0" class="text-xs text-neutral-500">
                             Nincs hamis érték felvéve.
                         </div>
                         <div v-else class="space-y-1 max-h-40 overflow-y-auto">
                             <div
-                                v-for="fv in recognitionFalseValues"
+                                v-for="fv in falseValues"
                                 :key="fv.id"
                                 class="flex items-center justify-between gap-2 text-xs text-neutral-200 bg-neutral-900 border border-neutral-800 rounded-lg px-2 py-1"
                             >
@@ -426,7 +426,7 @@ export default {
             imagesCard: [],
             imagesRecognition: [],
             imagesMap: [],
-            recognitionFalseValues: [],
+            falseValues: [],
             newCardValue: '',
             newRecognitionValue: '',
             newMapValue: '',
@@ -505,7 +505,7 @@ export default {
             }
         },
         async fetchImages(type) {
-            const { data } = await api.get('/api/game-images', { params: { type } })
+            const { data } = await api.get('/api/images', { params: { type } })
             if (type === 'card') {
                 this.imagesCard = data
             } else if (type === 'recognition') {
@@ -543,7 +543,7 @@ export default {
             formData.append('image', file)
 
             try {
-                const { data } = await api.post('/api/game-images', formData, {
+                const { data } = await api.post('/api/images', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 })
                 if (type === 'card') {
@@ -562,7 +562,7 @@ export default {
             } catch (e) {}
         },
         async deleteImage(type, image) {
-            await api.delete(`/api/game-images/${image.id}`)
+            await api.delete(`/api/images/${image.id}`)
             if (type === 'card') {
                 this.imagesCard = this.imagesCard.filter(i => i.id !== image.id)
             } else if (type === 'recognition') {
@@ -578,24 +578,24 @@ export default {
             return `${window.location.origin}/storage/${path}`
         },
         async fetchFalseValues() {
-            const { data } = await api.get('/api/recognition-false-values')
-            this.recognitionFalseValues = data
+            const { data } = await api.get('/api/false-values')
+            this.falseValues = data
         },
         async createFalseValue() {
             if (!this.newFalseValue) {
                 return
             }
             try {
-                const { data } = await api.post('/api/recognition-false-values', {
+                const { data } = await api.post('/api/false-values', {
                     value: this.newFalseValue,
                 })
-                this.recognitionFalseValues.push(data)
+                this.falseValues.push(data)
                 this.newFalseValue = ''
             } catch (e) {}
         },
         async deleteFalseValue(item) {
-            await api.delete(`/api/recognition-false-values/${item.id}`)
-            this.recognitionFalseValues = this.recognitionFalseValues.filter(v => v.id !== item.id)
+            await api.delete(`/api/false-values/${item.id}`)
+            this.falseValues = this.falseValues.filter(v => v.id !== item.id)
         },
     },
 }

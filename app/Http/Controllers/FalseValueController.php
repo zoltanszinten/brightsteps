@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\RecognitionFalseValue;
+use App\Models\FalseValue;
 use Illuminate\Http\Request;
 
-class RecognitionFalseValueController extends Controller
+class FalseValueController extends Controller
 {
     public function index()
     {
-        return RecognitionFalseValue::orderBy('value')->get();
+        return FalseValue::orderBy('value')->get();
     }
 
     public function store(Request $request)
@@ -18,14 +18,14 @@ class RecognitionFalseValueController extends Controller
             'value' => 'required|string|max:255',
         ]);
 
-        $item = RecognitionFalseValue::create([
+        $item = FalseValue::create([
             'value' => $request->input('value'),
         ]);
 
         return response()->json($item, 201);
     }
 
-    public function destroy(RecognitionFalseValue $recognitionFalseValue)
+    public function destroy(FalseValue $recognitionFalseValue)
     {
         $recognitionFalseValue->delete();
 

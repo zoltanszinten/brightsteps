@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('recognition_false_values', function (Blueprint $table) {
+        Schema::create('false_values', function (Blueprint $table) {
             $table->id();
             $table->string('value');
             $table->timestamps();
@@ -16,6 +16,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('recognition_false_values');
+        Schema::dropIfExists('false_values');
     }
 };
