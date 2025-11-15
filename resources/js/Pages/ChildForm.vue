@@ -141,14 +141,8 @@
         </div>
         <div class="rounded-3xl p-6 border bg-neutral-950 border-neutral-800">
             <h2 class="text-xl font-bold mb-4 text-amber-400">Előnézet</h2>
-            <div
-                :style="previewContainerStyle"
-                class="rounded-2xl p-4 border border-neutral-800 transition-colors duration-150"
-            >
-                <div
-                    :style="previewStyle"
-                    class="h-full w-full flex flex-col gap-4 rounded-2xl transition-colors duration-150"
-                >
+            <div :style="previewContainerStyle">
+                <div :style="[previewStyle, textBlockStyle]">
                     <div class="flex items-center justify-between gap-3">
                         <div class="flex flex-col">
                                 <span class="text-xs uppercase tracking-wide opacity-80" :style="mutedTextStyle">
@@ -173,23 +167,23 @@
                             dummy text of the printing and typesetting industry.
                         </p>
                         <p class="mb-2" :style="mutedTextStyle">
-                            Ez egy halványabb szöveg, hogy lásd a másodlagos színt.
+                            Másodlagos szín.
                         </p>
                         <div class="flex flex-wrap gap-3 mt-3">
                             <button
-                                class="px-4 py-3 rounded-2xl border text-sm font-semibold border-amber-400 text-amber-400 hover:bg-slate-900"
+                                class="px-4 py-3 rounded-2xl border text-sm font-semibold hover:bg-slate-900"
                                 :style="primaryButtonStyle"
                             >
                                 Elsődleges gomb
                             </button>
                             <button
-                                class="px-4 py-3 rounded-2xl border text-sm border-neutral-700 text-neutral-200 hover:bg-slate-900"
+                                class="px-4 py-3 rounded-2xl border text-sm hover:bg-slate-900"
                                 :style="secondaryButtonStyle"
                             >
                                 Másodlagos gomb
                             </button>
                             <button
-                                class="px-3 py-2 rounded-xl border text-xs border-neutral-700 text-neutral-200"
+                                class="px-3 py-2 rounded-xl border text-xs hover:bg-slate-900"
                                 :style="chipStyle"
                             >
                                 Kis chip
@@ -197,33 +191,15 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-3 text-xs">
+                    <div>
                         <div
-                            class="rounded-xl p-3 border flex flex-col gap-1 border-neutral-700 bg-neutral-900"
+                            class="rounded-xl p-3 border bg-neutral-900"
                             :style="smallCardStyle"
                         >
-                            <span class="font-semibold">Kártya játék</span>
-                            <span :style="mutedTextStyle">
-                                    Címkék, ikonok, rövid szöveg.
-                                </span>
-                        </div>
-                        <div
-                            class="rounded-xl p-3 border flex flex-col gap-1 border-neutral-700 bg-neutral-900"
-                            :style="smallCardStyle"
-                        >
-                            <span class="font-semibold">Képfelismerés</span>
-                            <span :style="mutedTextStyle">
-                                    Minta elem a modulhoz.
-                                </span>
-                        </div>
-                        <div
-                            class="rounded-xl p-3 border flex flex-col gap-1 border-neutral-700 bg-neutral-900"
-                            :style="smallCardStyle"
-                        >
-                            <span class="font-semibold">Térkép</span>
-                            <span :style="mutedTextStyle">
-                                    Térképes nézet előnézete.
-                                </span>
+                            <p class="font-semibold">Kártya</p>
+                            <p :style="mutedTextStyle">
+                                    Lorem Ipsum "Neque porro quisquam est..."
+                                </p>
                         </div>
                     </div>
                 </div>
