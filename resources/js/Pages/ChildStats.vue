@@ -27,13 +27,13 @@
             </div>
         </header>
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
             <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
                 <p class="text-neutral-400 text-sm">Összes játék</p>
                 <p class="text-2xl font-bold text-neutral-100">{{ totalSessions }}</p>
             </div>
             <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Átlag lépés</p>
+                <p class="text-neutral-400 text-sm">Átlag pont</p>
                 <p class="text-2xl font-bold text-neutral-100">
                     {{ averagePointsDisplay }}
                 </p>
@@ -42,12 +42,6 @@
                 <p class="text-neutral-400 text-sm">Átlag idő</p>
                 <p class="text-2xl font-bold text-neutral-100">
                     {{ averageTimeDisplay }}
-                </p>
-            </div>
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Legjobb lépés</p>
-                <p class="text-2xl font-bold text-neutral-100">
-                    {{ bestPointsDisplay }}
                 </p>
             </div>
         </div>
@@ -64,7 +58,7 @@
                 </p>
                 <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
                     <div>
-                        <p class="text-neutral-400">Átlag lépés</p>
+                        <p class="text-neutral-400">Átlag pont</p>
                         <p class="font-semibold">
                             {{ formatPercent(t.avgPoints) }}
                         </p>

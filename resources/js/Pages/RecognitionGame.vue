@@ -1,156 +1,508 @@
 <template>
-    <section class="container mx-auto px-2 sm:px-4 pt-4 pb-8 select-none">
-        <!-- Image panel -->
-        <div class="mx-auto max-w-5xl rounded-2xl border border-neutral-800 bg-neutral-950 overflow-hidden">
-            <div class="mx-auto w-full max-w-2xl aspect-[16/9] bg-neutral-900 rounded-2xl overflow-hidden flex items-center justify-center">
-                <div class="w-full h-full grid place-items-center px-4">
-                    <div class="text-center">
-                        <p class="text-amber-400 font-extrabold tracking-widest mb-2 text-lg sm:text-xl">
-                            {{ currentItem.titleHU }}
-                        </p>
-                        <p class="text-neutral-300 text-xs sm:text-sm">Kép helye</p>
+    <section
+        class="min-h-screen flex flex-col items-center justify-start pt-4 pb-10 px-2 sm:px-4 select-none"
+        :style="pageStyle"
+    >
+        <div class="w-full flex flex-col items-center gap-6" :style="textBlockStyle">
+            <div class="mx-auto" :style="gridWrapperStyle">
+                <div
+                    class="rounded-2xl border p-4 flex flex-col gap-4"
+                    :style="panelStyle"
+                    v-if="currentQuestion"
+                >
+                    <div class="w-full">
+                        <div
+                            class="relative rounded-xl sm:rounded-2xl border overflow-hidden"
+                            :style="questionCardStyle"
+                        >
+                            <img
+                                v-if="currentQuestion.image"
+                                :src="imageUrl(currentQuestion.image.path || currentQuestion.image.url)"
+                                :alt="currentQuestion.value"
+                                class="w-full h-auto object-contain block"
+                            />
+                        </div>
                     </div>
+
+                    <div class="grid gap-3 sm:gap-4 w-full" :style="optionsGridStyle">
+                        <button
+                            v-for="opt in currentQuestion.options"
+                            :key="opt"
+                            class="rounded-xl sm:rounded-2xl border px-4 py-3 break-words whitespace-normal text-center font-semibold focus:outline-none"
+                            :style="optionStyle(opt)"
+                            @click="selectOption(opt)"
+                            :disabled="lock || win"
+                        >
+                            <span class="pointer-events-none tracking-widest text-center" :style="cardTextStyle">
+                                {{ opt }}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    v-else
+                    class="rounded-2xl border p-6 text-center"
+                    :style="panelStyle"
+                >
+                    Nincs elérhető feladat.
                 </div>
             </div>
 
+            <div class="grid sm:grid-cols-3 gap-3 sm:gap-4 mx-auto" :style="[hudWrapperStyle, textBlockStyle]">
+                <div class="rounded-2xl border p-4" :style="panelStyle">
+                    <p :style="mutedTextStyle" class="break-words whitespace-normal">Kérdés</p>
+                    <p class="font-bold">
+                        {{ totalQuestions ? currentQuestionIndex + 1 : 0 }}/{{ totalQuestions }}
+                    </p>
+                </div>
+                <div class="rounded-2xl border p-4" :style="panelStyle">
+                    <p :style="mutedTextStyle" class="break-words whitespace-normal">Idő</p>
+                    <p class="font-bold">{{ timeText }}</p>
+                </div>
+                <div class="rounded-2xl border p-4" :style="panelStyle">
+                    <p :style="mutedTextStyle" class="break-words whitespace-normal">Helyes válaszok</p>
+                    <p class="font-bold">{{ correctCount }}/{{ totalQuestions }}</p>
+                </div>
+            </div>
 
-            <!-- Choices -->
-            <div class="p-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <button
-                    v-for="(c, i) in currentItem.choicesHU"
-                    :key="i"
-                    class="px-3 py-3 rounded-2xl border text-middle text-amber-400 border-amber-400 focus:outline-none"
-                    :class="buttonClass(i)"
-                    @click="onChoose(i)"
-                    :disabled="locked"
+            <div
+                v-if="win"
+                class="fixed inset-0 z-40 flex items-center justify-center px-4"
+            >
+                <div
+                    class="absolute inset-0"
+                    :style="backdropStyle"
+                    @click="nextGame"
+                ></div>
+
+                <div
+                    class="relative mx-auto rounded-2xl border p-6 max-w-xl w-full text-center z-50"
+                    :style="[winPanelStyle, textBlockStyle]"
                 >
-                    {{ c }}
-                </button>
+                    <p class="font-bold mb-2">Kész!</p>
+                    <p>
+                        Kérdések:
+                        <span class="font-semibold">{{ totalQuestions }}</span>
+                        • Helyes válaszok:
+                        <span class="font-semibold">{{ correctCount }}</span>
+                        • Idő:
+                        <span class="font-semibold">{{ timeText }}</span>
+                    </p>
+                    <button
+                        class="mt-4 px-4 py-2 rounded-xl border text-sm font-semibold inline-flex items-center justify-center"
+                        :style="primaryButtonStyle"
+                        @click="nextGame"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            class="w-7 h-7"
+                        >
+                            <path
+                                d="M5 12h11"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+                            <path
+                                d="M13 6l6 6-6 6"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
-
-        <!-- HUD -->
-        <div class="grid sm:grid-cols-3 gap-3 sm:gap-4 mt-5 mx-auto max-w-5xl">
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Feladat</p>
-                <p class="text-2xl font-bold text-neutral-100">{{ index+1 }}/{{ items.length }}</p>
-            </div>
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Pont</p>
-                <p class="text-2xl font-bold text-neutral-100">{{ score }}</p>
-            </div>
-            <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <p class="text-neutral-400 text-sm">Idő</p>
-                <p class="text-2xl font-bold text-neutral-100">{{ timeText }}</p>
-            </div>
-        </div>
-
-        <!-- Controls -->
-        <div class="mt-5 mx-auto max-w-5xl flex items-center justify-between">
-            <button class="px-4 py-3 rounded-xl border border-neutral-700 text-neutral-200" @click="resetGame">
-                Újrakezdés
-            </button>
-            <button class="px-4 py-3 rounded-xl border border-amber-400 text-amber-400" @click="nextTask" :disabled="!canNext">
-                Következő
-            </button>
-        </div>
-
-        <!-- Result -->
-        <div v-if="finished" class="mt-6 mx-auto max-w-3xl rounded-2xl border border-amber-400 bg-neutral-900 p-6">
-            <p class="text-xl font-bold text-amber-400 mb-2">Kész!</p>
-            <p class="text-neutral-200">Pont: <span class="font-semibold">{{ score }}</span> • Idő: <span class="font-semibold">{{ timeText }}</span></p>
-        </div>
-
-        <p id="live" class="sr-only" role="status" aria-live="polite"></p>
     </section>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+<script>
+import api from '../api'
 
-const items = ref([
-    {
-        id: 'm1',
-        titleHU: 'Hol van metróállomás?',
-        image: null,
-        choicesHU: ['Kálvin tér', 'Uzsoki kórház', 'ELTE Parkoló', 'Iskola bejárat'],
-        answer: 1,
+export default {
+    name: 'RecognitionGame',
+    data() {
+        return {
+            settings: null,
+            palette: null,
+            gameImages: [],
+            falseValues: [],
+            questions: [],
+            currentQuestionIndex: 0,
+            selectedOption: null,
+            lock: false,
+            moves: 0,
+            correctCount: 0,
+            timer: 0,
+            timerHandle: null
+        }
     },
-    {
-        id: 'm1',
-        titleHU: 'Hol van metróállomás 2?',
-        image: null,
-        choicesHU: ['Kálvin tér', 'Uzsoki kórház', 'ELTE Parkoló', 'Iskola bejárat'],
-        answer: 1,
+    computed: {
+        backdropStyle() {
+            return {
+                backgroundColor: 'rgba(0,0,0,0.5)'
+            }
+        },
+        currentQuestion() {
+            if (!this.questions.length) {
+                return null
+            }
+            return this.questions[this.currentQuestionIndex] || null
+        },
+        totalQuestions() {
+            return this.questions.length
+        },
+        win() {
+            return this.totalQuestions > 0 && this.moves === this.totalQuestions
+        },
+        timeText() {
+            const m = Math.floor(this.timer / 60)
+            const s = this.timer % 60
+            return m ? `${m} p ${String(s).padStart(2, '0')} mp` : `${s} mp`
+        },
+        pageStyle() {
+            if (!this.palette) {
+                return {}
+            }
+            return {
+                backgroundColor: this.palette.background,
+                color: this.palette.text
+            }
+        },
+        gridWrapperStyle() {
+            const style = { maxWidth: '72rem', width: '100%' }
+            if (this.settings && this.settings.width) {
+                style.maxWidth = this.settings.width + 'px'
+            }
+            return style
+        },
+        hudWrapperStyle() {
+            const style = { maxWidth: '32rem', width: '100%' }
+            if (this.settings && this.settings.width) {
+                style.maxWidth = Math.min(this.settings.width, 800) + 'px'
+            }
+            return style
+        },
+        textBlockStyle() {
+            if (!this.settings) {
+                return {}
+            }
+            return {
+                letterSpacing: `${(this.settings.letter_spacing ?? 0) / 100}em`,
+                lineHeight: (this.settings.line_height ?? 160) / 100,
+                fontSize: (this.settings.font_size ?? 18) + 'px'
+            }
+        },
+        mutedTextStyle() {
+            if (!this.palette) {
+                return {}
+            }
+            return { color: this.palette.text_muted }
+        },
+        panelStyle() {
+            if (!this.palette) {
+                return {}
+            }
+            return {
+                backgroundColor: this.palette.surface_alt,
+                borderColor: this.palette.border,
+                color: this.palette.text
+            }
+        },
+        winPanelStyle() {
+            if (!this.palette) {
+                return {}
+            }
+            return {
+                backgroundColor: this.palette.surface_alt,
+                borderColor: this.palette.accent,
+                color: this.palette.text
+            }
+        },
+        primaryButtonStyle() {
+            if (!this.palette) {
+                return {}
+            }
+            return {
+                backgroundColor: this.palette.accent,
+                color: this.palette.accent_text,
+                borderColor: this.palette.accent
+            }
+        },
+        cardTextStyle() {
+            return {
+                fontSize: `${this.settings?.font_size}px`,
+                letterSpacing: `${this.settings?.letter_spacing / 100}em`,
+                lineHeight: this.settings?.line_height / 100
+            }
+        },
+        questionCardStyle() {
+            if (!this.palette) {
+                return {}
+            }
+            const style = {
+                borderColor: this.palette.border,
+                backgroundColor: this.palette.surface,
+                color: this.palette.text,
+                width: '100%'
+            }
+            if (this.settings && this.settings.width) {
+                style.maxWidth = this.settings.width + 'px'
+            }
+            style.maxHeight = '480px'
+            return style
+        },
+        optionsGridStyle() {
+            return {
+                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))'
+            }
+        }
     },
-    {
-        id: 'm1',
-        titleHU: 'Hol van metróállomás?',
-        image: null,
-        choicesHU: ['Kálvin tér', 'Uzsoki kórház', 'ELTE Parkoló', 'Iskola bejárat'],
-        answer: 1,
+    created() {
+        this.init()
     },
-])
+    beforeUnmount() {
+        if (this.timerHandle) {
+            clearInterval(this.timerHandle)
+        }
+    },
+    methods: {
+        async init() {
+            await this.fetchConfig()
 
-const index = ref(0)
-const score = ref(0)
-const locked = ref(false)
-const picked = ref(null)
-const timer = ref(0)
-let tick = null
+            this.currentQuestionIndex = 0
+            this.selectedOption = null
+            this.lock = false
+            this.moves = 0
+            this.correctCount = 0
+            this.timer = 0
 
-const finished = computed(()=> index.value >= items.value.length)
-const currentItem = computed(()=> items.value[Math.min(index.value, items.value.length-1)] || items.value[0])
-const canNext = computed(()=> picked.value !== null || finished.value)
+            this.buildQuestionsFromImages()
+            this.startTimer()
+        },
+        async fetchConfig() {
+            const { data: user } = await api.get('/api/user')
+            this.settings = user.user.settings
 
-const timeText = computed(()=>{
-    const m = Math.floor(timer.value / 60)
-    const s = timer.value % 60
-    return m ? `${m} p ${String(s).padStart(2,'0')} mp` : `${s} mp`
-})
+            if (this.settings) {
+                if(!this.settings.show_recognition_game){
+                    this.nextGame()
+                }
 
-onMounted(()=> { resetGame(); tick = setInterval(()=> { if(!finished.value) timer.value++ }, 1000) })
-onBeforeUnmount(()=> clearInterval(tick))
+                if(this.settings.color_palette_id){
+                    const { data: pal } = await api.get(`/api/color-palettes/${this.settings.color_palette_id}`)
+                    this.palette = pal
+                }
+            }
 
-function resetGame(){
-    index.value = 0
-    score.value = 0
-    locked.value = false
-    picked.value = null
-    timer.value = 0
-    announce('Új játék.')
-}
+            const { data: imgs } = await api.get('/api/images', { params: { type: 'recognition' } })
+            this.gameImages = imgs
 
-function onChoose(i){
-    if(locked.value || finished.value) return
-    picked.value = i
-    locked.value = true
-    const ok = i === currentItem.value.answer
-    if(ok) { score.value += 1; announce('Helyes válasz.') } else { announce('Helytelen válasz.') }
-}
+            const { data: falseVals } = await api.get('/api/false-values')
+            this.falseValues = falseVals
+        },
+        startTimer() {
+            if (this.timerHandle) {
+                clearInterval(this.timerHandle)
+            }
 
-function nextTask(){
-    if(!canNext.value) return
-    index.value += 1
-    locked.value = false
-    picked.value = null
-    if(!finished.value) announce('Következő feladat.')
-    else announce('Játék vége.')
-}
+            this.timerHandle = setInterval(() => {
+                if (!this.win) {
+                    this.timer++
+                }
+            }, 1000)
+        },
+        extractFalseValue(item) {
+            if (typeof item === 'string') {
+                return item
+            }
 
-function buttonClass(i){
-    const base = 'border-neutral-800 bg-neutral-950 hover:bg-neutral-900 text-neutral-100 focus:ring-4 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-neutral-900'
-    if(picked.value === null) return base
-    const ok = i === currentItem.value.answer
-    const mine = i === picked.value
-    if(ok && mine) return `${base} border-emerald-600 text-emerald-300 bg-emerald-900/20`
-    if(ok) return `${base} border-emerald-600 text-emerald-300`
-    if(mine) return `${base} border-red-600 text-red-300`
-    return base
-}
+            if (item && typeof item === 'object') {
+                if (typeof item.value === 'string' && item.value.length > 0) {
+                    return item.value
+                }
+                if (typeof item.label === 'string' && item.label.length > 0) {
+                    return item.label
+                }
+                if (typeof item.name === 'string' && item.name.length > 0) {
+                    return item.name
+                }
+            }
 
-function announce(msg){
-    const el = document.getElementById('live')
-    if(el){ el.textContent = msg; setTimeout(()=> el.textContent = '', 1200) }
+            return String(item)
+        },
+        buildQuestionsFromImages() {
+            const list = this.gameImages
+
+            const shuffled = list.slice()
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1))
+                const temp = shuffled[i]
+                shuffled[i] = shuffled[j]
+                shuffled[j] = temp
+            }
+
+            let maxQuestions = 10
+            if (shuffled.length < maxQuestions) {
+                maxQuestions = shuffled.length
+            }
+            const selected = shuffled.slice(0, maxQuestions)
+
+            const allImageValues = []
+            for (let i = 0; i < list.length; i++) {
+                const value = list[i].value
+                if (allImageValues.indexOf(value) === -1) {
+                    allImageValues.push(value)
+                }
+            }
+
+            const allWrongValues = []
+            for (let i = 0; i < allImageValues.length; i++) {
+                const value = allImageValues[i]
+                if (allWrongValues.indexOf(value) === -1) {
+                    allWrongValues.push(value)
+                }
+            }
+
+            for (let i = 0; i < this.falseValues.length; i++) {
+                const raw = this.falseValues[i]
+                const value = this.extractFalseValue(raw)
+                if (allWrongValues.indexOf(value) === -1) {
+                    allWrongValues.push(value)
+                }
+            }
+
+            const questions = []
+
+            for (let i = 0; i < selected.length; i++) {
+                const img = selected[i]
+                const correct = img.value
+
+                const pool = []
+                for (let k = 0; k < allWrongValues.length; k++) {
+                    const v = allWrongValues[k]
+                    if (v !== correct) {
+                        pool.push(v)
+                    }
+                }
+
+                const wrongOptions = this.getRandomSample(pool, 3)
+
+                const options = [correct]
+                for (let k = 0; k < wrongOptions.length; k++) {
+                    const v = wrongOptions[k]
+                    if (options.indexOf(v) === -1) {
+                        options.push(v)
+                    }
+                }
+
+                for (let k = options.length - 1; k > 0; k--) {
+                    const j = Math.floor(Math.random() * (k + 1))
+                    const temp = options[k]
+                    options[k] = options[j]
+                    options[j] = temp
+                }
+
+                questions.push({
+                    id: img.id || i,
+                    image: img,
+                    value: correct,
+                    options: options
+                })
+            }
+
+            this.questions = questions
+        },
+        getRandomSample(arr, n) {
+            const result = []
+            const copy = arr.slice()
+
+            if (n > copy.length) {
+                n = copy.length
+            }
+
+            for (let i = 0; i < n; i++) {
+                const idx = Math.floor(Math.random() * copy.length)
+                result.push(copy[idx])
+                copy.splice(idx, 1)
+            }
+
+            return result
+        },
+        async saveStatistics() {
+            const percent = (this.correctCount / this.totalQuestions) * 100
+            await api.post('/api/statistics', {
+                type: 'recognition',
+                points: percent,
+                time: this.timer
+            })
+        },
+        nextGame() {
+            this.$router.push({ name: 'map-game' })
+        },
+        selectOption(option) {
+            if (this.lock || this.win || !this.currentQuestion) {
+                return
+            }
+
+            this.lock = true
+            this.selectedOption = option
+
+            if (option === this.currentQuestion.value) {
+                this.correctCount++
+            }
+
+            this.moves++
+
+            setTimeout(() => {
+                if (this.moves >= this.totalQuestions) {
+                    if (this.win) {
+                        this.saveStatistics()
+                    }
+                    this.lock = false
+                    return
+                }
+
+                this.currentQuestionIndex++
+                this.selectedOption = null
+                this.lock = false
+            }, 500)
+        },
+        optionStyle(option) {
+            if (!this.palette) {
+                return {}
+            }
+
+            const base = {
+                borderColor: this.palette.border,
+                backgroundColor: this.palette.surface,
+                color: this.palette.text
+            }
+
+            if (!this.currentQuestion) {
+                return base
+            }
+
+            if (this.selectedOption && this.lock) {
+                if (option === this.currentQuestion.value) {
+                    base.backgroundColor = this.palette.accent
+                    base.color = this.palette.accent_text
+                    base.borderColor = this.palette.accent
+                } else if (option === this.selectedOption && option !== this.currentQuestion.value) {
+                    base.backgroundColor = this.palette.surface_alt
+                }
+            }
+
+            return base
+        },
+        imageUrl(path) {
+            return `${window.location.origin}/storage/${path}`
+        }
+    }
 }
 </script>

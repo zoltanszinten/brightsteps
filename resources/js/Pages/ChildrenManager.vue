@@ -566,9 +566,6 @@ export default {
             }
         },
         imageUrl(path) {
-            if (!path) {
-                return ''
-            }
             return `${window.location.origin}/storage/${path}`
         },
         async fetchFalseValues() {

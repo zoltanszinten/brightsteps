@@ -79,59 +79,71 @@
                 </div>
             </div>
 
-            <div class="grid sm:grid-cols-3 gap-3 sm:gap-4 mx-auto" :style="hudWrapperStyle">
+            <div class="grid sm:grid-cols-3 gap-3 sm:gap-4 mx-auto" :style="[hudWrapperStyle, textBlockStyle]">
                 <div class="rounded-2xl border p-4" :style="panelStyle">
-                    <p :style="mutedTextStyle" class="text-sm">Lépések</p>
-                    <p class="text-2xl font-bold">{{ moves }}</p>
+                    <p :style="mutedTextStyle" class="break-words whitespace-normal">Lépések</p>
+                    <p class="font-bold">{{ moves }}</p>
                 </div>
                 <div class="rounded-2xl border p-4" :style="panelStyle">
-                    <p :style="mutedTextStyle" class="text-sm">Idő</p>
-                    <p class="text-2xl font-bold">{{ timeText }}</p>
+                    <p :style="mutedTextStyle" class="break-words whitespace-normal">Idő</p>
+                    <p class="font-bold">{{ timeText }}</p>
                 </div>
                 <div class="rounded-2xl border p-4" :style="panelStyle">
-                    <p :style="mutedTextStyle" class="text-sm">Párok</p>
-                    <p class="text-2xl font-bold">{{ matchedCount }}/{{ totalPairs }}</p>
+                    <p :style="mutedTextStyle" class="break-words whitespace-normal">Párok</p>
+                    <p class="font-bold">{{ matchedCount }}/{{ totalPairs }}</p>
                 </div>
             </div>
 
             <div
                 v-if="win"
-                class="mx-auto rounded-2xl border p-6 max-w-xl text-center"
-                :style="winPanelStyle"
+                class="fixed inset-0 z-40 flex items-center justify-center px-4"
             >
-                <p class="text-xl font-bold mb-2">Kész!</p>
-                <p>
-                    Lépések:
-                    <span class="font-semibold">{{ moves }}</span>
-                    • Idő:
-                    <span class="font-semibold">{{ timeText }}</span>
-                </p>
-                <button
-                    class="mt-4 px-4 py-2 rounded-xl border text-sm font-semibold"
-                    :style="primaryButtonStyle"
+                <div
+                    class="absolute inset-0"
+                    :style="backdropStyle"
                     @click="nextGame"
+                ></div>
+
+                <div
+                    class="relative mx-auto rounded-2xl border p-6 max-w-xl w-full text-center z-50"
+                    :style="[winPanelStyle, textBlockStyle]"
                 >
-                    <svg
-                        viewBox="0 0 24 24"
-                        class="w-7 h-7"
+                    <p class="font-bold mb-2">Kész!</p>
+                    <p>
+                        Lépések:
+                        <span class="font-semibold">{{ moves }}</span>
+                        • Párok:
+                        <span class="font-semibold">{{ matchedCount }}/{{ totalPairs }}</span>
+                        • Idő:
+                        <span class="font-semibold">{{ timeText }}</span>
+                    </p>
+                    <button
+                        class="mt-4 px-4 py-2 rounded-xl border text-sm font-semibold inline-flex items-center justify-center"
+                        :style="primaryButtonStyle"
+                        @click="nextGame"
                     >
-                        <path
-                            d="M5 12h11"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                        />
-                        <path
-                            d="M13 6l6 6-6 6"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-                </button>
+                        <svg
+                            viewBox="0 0 24 24"
+                            class="w-7 h-7"
+                        >
+                            <path
+                                d="M5 12h11"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+                            <path
+                                d="M13 6l6 6-6 6"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </section>
@@ -158,6 +170,11 @@ export default {
         }
     },
     computed: {
+        backdropStyle() {
+            return {
+                backgroundColor: 'rgba(0,0,0,0.5)'
+            }
+        },
         totalPairs() {
             return this.cards.length / 2
         },
@@ -290,9 +307,15 @@ export default {
             const { data: user } = await api.get('/api/user')
             this.settings = user.user.settings
 
-            if (this.settings && this.settings.color_palette_id) {
-                const { data: pal } = await api.get(`/api/color-palettes/${this.settings.color_palette_id}`)
-                this.palette = pal
+            if (this.settings) {
+                if(!this.settings.show_card_game){
+                    this.nextGame()
+                }
+
+                if(this.settings.color_palette_id){
+                    const { data: pal } = await api.get(`/api/color-palettes/${this.settings.color_palette_id}`)
+                    this.palette = pal
+                }
             }
 
             const { data: imgs } = await api.get('/api/images', { params: { type: 'card' } })
@@ -375,7 +398,7 @@ export default {
             })
         },
         nextGame() {
-
+            this.$router.push({ name: 'recognition-game' })
         },
         onFlip(uid) {
             if (this.lock || this.win){

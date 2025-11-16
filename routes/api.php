@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/color-palettes/{colorPalette}', [ColorPaletteController::class, 'details']);
     Route::get('/images', [ImageController::class, 'index']);
     Route::post('/statistics', [StatisticController::class, 'store']);
+    Route::get('/false-values', [FalseValueController::class, 'index']);
 
     Route::middleware(RoleMiddleware::class . ':admin')->group(function () {
         Route::get('/children', [UserController::class, 'children']);
@@ -31,7 +32,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/images', [ImageController::class, 'store']);
         Route::delete('/images/{image}', [ImageController::class, 'destroy']);
 
-        Route::get('/false-values', [FalseValueController::class, 'index']);
         Route::post('/false-values', [FalseValueController::class, 'store']);
         Route::delete('/false-values/{falseValue}', [FalseValueController::class, 'destroy']);
 
