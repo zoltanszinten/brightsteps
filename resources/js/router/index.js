@@ -103,6 +103,13 @@ router.beforeEach(async (to, from, next) => {
         })
     }
 
+    if ((to.name === 'children' || to.name === 'statistics') && cached?.user?.type && cached.user.type !== 'default') {
+        return next({
+            name: 'card-game',
+            replace: true,
+        })
+    }
+
     return next()
 })
 
