@@ -5,7 +5,6 @@
                 <span class="text-xl font-extrabold tracking-wider">BrightSteps</span>
             </div>
             <div class="flex items-center gap-4">
-                <span v-if="isLoggedIn" class="text-sm text-amber-400">{{ displayName }}</span>
                 <button v-if="isLoggedIn"
                         class="px-4 py-3 rounded-2xl border text-amber-400 border-amber-400 hover:bg-neutral-900"
                         @click="logout">

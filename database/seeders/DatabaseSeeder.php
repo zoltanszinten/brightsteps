@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,9 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->environment('testing')) {
+            $this->call(\Database\Seeders\TestSeeder::class);
+        }
+        
         $this->call(\Database\Seeders\RolesAndPermissionsSeeder::class);
         $this->call(\Database\Seeders\AdminUserSeeder::class);
         $this->call(\Database\Seeders\ColorPaletteSeeder::class);
-        $this->call(\Database\Seeders\ChildrenAndStatisticsSeeder::class);
     }
 }

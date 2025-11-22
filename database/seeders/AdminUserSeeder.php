@@ -15,8 +15,8 @@ class AdminUserSeeder extends Seeder
 
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
 
-        $email = env('SEED_ADMIN_EMAIL');
-        $password = env('SEED_ADMIN_PASSWORD');
+        $email = env('SEED_ADMIN_EMAIL', 'admin@admin.com');
+        $password = env('SEED_ADMIN_PASSWORD', 'Asdfasdf123');
 
         $user = User::firstOrNew(['email' => $email]);
         $user->name = 'Administrator';
