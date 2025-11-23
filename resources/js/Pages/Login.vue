@@ -3,7 +3,6 @@
         <div class="mx-auto max-w-xl">
             <div class="text-center mb-8">
                 <h1 class="text-4xl font-extrabold tracking-widest text-amber-400">Bejelentkezés</h1>
-                <p class="mt-2 tracking-wide text-slate-300">Lépj be a gyakorló feladatokhoz</p>
             </div>
 
             <form class="space-y-5 rounded-3xl p-8 shadow-sm border bg-neutral-900 border-amber-400"
