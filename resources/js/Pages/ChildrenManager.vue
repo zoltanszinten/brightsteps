@@ -2,7 +2,8 @@
     <section class="container mx-auto px-4 py-8">
         <header class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-extrabold tracking-widest text-amber-400">Gyerekek kezelése</h1>
-            <button @click="createChild()" class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400 hover:bg-neutral-900">
+            <button @click="createChild()"
+                    class="px-3 py-2 rounded-xl border border-amber-400 text-amber-400 hover:bg-neutral-900">
                 Új gyerek
             </button>
         </header>
@@ -38,9 +39,9 @@
                         >
                             <span class="sr-only">Statisztikák</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24">
-                                <path d="M5 21V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                                <path d="M12 21V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                                <path d="M19 21V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                <path d="M5 21V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 21V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M19 21V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                         </button>
                         <button
@@ -143,8 +144,17 @@
                         </div>
                         <div>
                             <label class="block text-sm text-neutral-300 mb-1">Kép</label>
-                            <input type="file" accept="image/*" @change="handleFileChange('card', $event)"
-                                   class="w-full text-sm text-neutral-300"/>
+
+                            <label
+                                class="cursor-pointer inline-flex items-center px-4 py-2 border-amber-400 text-amber-400 w-full rounded">
+                                Válassz egy képet
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    @change="handleFileChange('card', $event)"
+                                    class="hidden"
+                                />
+                            </label>
                         </div>
                         <button
                             type="submit"
@@ -164,7 +174,8 @@
                                 :key="img.id"
                                 class="flex items-center gap-3"
                             >
-                                <div class="w-12 h-12 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex-shrink-0">
+                                <div
+                                    class="w-12 h-12 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex-shrink-0">
                                     <img
                                         v-if="imageUrl(img.path)"
                                         :src="imageUrl(img.path)"
@@ -182,7 +193,8 @@
                                     title="Törlés"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24">
-                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2"
+                                              stroke-linecap="round"/>
                                         <path
                                             d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
                                             stroke="currentColor"
@@ -216,8 +228,16 @@
                         </div>
                         <div>
                             <label class="block text-sm text-neutral-300 mb-1">Kép</label>
-                            <input type="file" accept="image/*" @change="handleFileChange('recognition', $event)"
-                                   class="w-full text-sm text-neutral-300"/>
+                            <label
+                                class="cursor-pointer inline-flex items-center px-4 py-2 border-amber-400 text-amber-400 w-full rounded">
+                                Válassz egy képet
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    @change="handleFileChange('recognition', $event)"
+                                    class="hidden"
+                                />
+                            </label>
                         </div>
                         <button
                             type="submit"
@@ -237,7 +257,8 @@
                                 :key="img.id"
                                 class="flex items-center gap-3"
                             >
-                                <div class="w-12 h-12 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex-shrink-0">
+                                <div
+                                    class="w-12 h-12 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex-shrink-0">
                                     <img
                                         v-if="imageUrl(img.path)"
                                         :src="imageUrl(img.path)"
@@ -255,7 +276,8 @@
                                     title="Törlés"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24">
-                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2"
+                                              stroke-linecap="round"/>
                                         <path
                                             d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
                                             stroke="currentColor"
@@ -307,7 +329,8 @@
                                     title="Törlés"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24">
-                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2"
+                                              stroke-linecap="round"/>
                                         <path
                                             d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
                                             stroke="currentColor"
@@ -341,8 +364,16 @@
                         </div>
                         <div>
                             <label class="block text-sm text-neutral-300 mb-1">Kép</label>
-                            <input type="file" accept="image/*" @change="handleFileChange('map', $event)"
-                                   class="w-full text-sm text-neutral-300"/>
+                            <label
+                                class="cursor-pointer inline-flex items-center px-4 py-2 border-amber-400 text-amber-400 w-full rounded">
+                                Válassz egy képet
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    @change="handleFileChange('map', $event)"
+                                    class="hidden"
+                                />
+                            </label>
                         </div>
                         <button
                             type="submit"
@@ -362,7 +393,8 @@
                                 :key="img.id"
                                 class="flex items-center gap-3"
                             >
-                                <div class="w-12 h-12 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex-shrink-0">
+                                <div
+                                    class="w-12 h-12 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex-shrink-0">
                                     <img
                                         v-if="imageUrl(img.path)"
                                         :src="imageUrl(img.path)"
@@ -380,7 +412,8 @@
                                     title="Törlés"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24">
-                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        <path d="M6 7H18" stroke="currentColor" stroke-width="2"
+                                              stroke-linecap="round"/>
                                         <path
                                             d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
                                             stroke="currentColor"
@@ -443,7 +476,7 @@ export default {
     },
     methods: {
         async fetchChildren() {
-            const { data } = await api.get('/api/children')
+            const {data} = await api.get('/api/children')
             this.children = data
         },
         formatDate(value) {
@@ -457,16 +490,16 @@ export default {
             return dateFormatter.format(date)
         },
         gotoStatistics(id) {
-            this.$router.push({ name: 'statistics', params: { id } })
+            this.$router.push({name: 'statistics', params: {id}})
         },
         gotoEdit(id) {
-            this.$router.push({ name: 'child-edit', params: { id } })
+            this.$router.push({name: 'child-edit', params: {id}})
         },
         createChild() {
-            this.$router.push({ name: 'child-new' })
+            this.$router.push({name: 'child-new'})
         },
         async copyLink(id) {
-            const { data } = await api.get(`/api/token/${id}`)
+            const {data} = await api.get(`/api/token/${id}`)
             const token = data.token
             if (!token) {
                 return
@@ -479,7 +512,8 @@ export default {
                         text: 'Megosztott játék link.',
                         url,
                     })
-                } catch (e) {}
+                } catch (e) {
+                }
             } else if (navigator.clipboard && navigator.clipboard.writeText) {
                 await navigator.clipboard.writeText(url)
             }
@@ -499,7 +533,7 @@ export default {
             }
         },
         async fetchImages(type) {
-            const { data } = await api.get('/api/images', { params: { type } })
+            const {data} = await api.get('/api/images', {params: {type}})
             if (type === 'card') {
                 this.imagesCard = data
             } else if (type === 'recognition') {
@@ -537,8 +571,8 @@ export default {
             formData.append('image', file)
 
             try {
-                const { data } = await api.post('/api/images', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                const {data} = await api.post('/api/images', formData, {
+                    headers: {'Content-Type': 'multipart/form-data'},
                 })
                 if (type === 'card') {
                     this.imagesCard.unshift(data)
@@ -553,7 +587,8 @@ export default {
                     this.newMapValue = ''
                     this.newMapFile = null
                 }
-            } catch (e) {}
+            } catch (e) {
+            }
         },
         async deleteImage(type, image) {
             await api.delete(`/api/images/${image.id}`)
@@ -569,7 +604,7 @@ export default {
             return `${window.location.origin}/storage/${path}`
         },
         async fetchFalseValues() {
-            const { data } = await api.get('/api/false-values')
+            const {data} = await api.get('/api/false-values')
             this.falseValues = data
         },
         async createFalseValue() {
@@ -577,12 +612,13 @@ export default {
                 return
             }
             try {
-                const { data } = await api.post('/api/false-values', {
+                const {data} = await api.post('/api/false-values', {
                     value: this.newFalseValue,
                 })
                 this.falseValues.push(data)
                 this.newFalseValue = ''
-            } catch (e) {}
+            } catch (e) {
+            }
         },
         async deleteFalseValue(item) {
             await api.delete(`/api/false-values/${item.id}`)
