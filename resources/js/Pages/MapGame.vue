@@ -27,13 +27,13 @@
                         <button
                             class="rounded-xl sm:rounded-2xl border px-4 py-3 text-center font-semibold focus:outline-none inline-flex items-center justify-center gap-2"
                             :style="buttonStyle()"
-                            @click="press('L')"
+                            @click="press('B')"
                             :disabled="finished"
                         >
                             <svg
                                 viewBox="0 0 24 24"
                                 class="w-7 h-7"
-                                :style="arrowDirStyle('L')"
+                                :style="arrowDirStyle('B')"
                             >
                                 <path
                                     d="M5 12h11"
@@ -55,13 +55,13 @@
                         <button
                             class="rounded-xl sm:rounded-2xl border px-4 py-3 text-center font-semibold focus:outline-none inline-flex items-center justify-center gap-2"
                             :style="buttonStyle()"
-                            @click="press('F')"
+                            @click="press('E')"
                             :disabled="finished"
                         >
                             <svg
                                 viewBox="0 0 24 24"
                                 class="w-7 h-7"
-                                :style="arrowDirStyle('F')"
+                                :style="arrowDirStyle('E')"
                             >
                                 <path
                                     d="M5 12h11"
@@ -83,13 +83,13 @@
                         <button
                             class="rounded-xl sm:rounded-2xl border px-4 py-3 text-center font-semibold focus:outline-none inline-flex items-center justify-center gap-2"
                             :style="buttonStyle()"
-                            @click="press('R')"
+                            @click="press('J')"
                             :disabled="finished"
                         >
                             <svg
                                 viewBox="0 0 24 24"
                                 class="w-7 h-7"
-                                :style="arrowDirStyle('R')"
+                                :style="arrowDirStyle('J')"
                             >
                                 <path
                                     d="M5 12h11"
@@ -255,14 +255,14 @@ export default {
             }
         },
         gridWrapperStyle() {
-            const style = { maxWidth: '72rem', width: '100%' }
+            const style = {maxWidth: '72rem', width: '100%'}
             if (this.settings && this.settings.width) {
                 style.maxWidth = this.settings.width + 'px'
             }
             return style
         },
         hudWrapperStyle() {
-            const style = { maxWidth: '32rem', width: '100%' }
+            const style = {maxWidth: '32rem', width: '100%'}
             if (this.settings && this.settings.width) {
                 style.maxWidth = Math.min(this.settings.width, 800) + 'px'
             }
@@ -282,7 +282,7 @@ export default {
             if (!this.palette) {
                 return {}
             }
-            return { color: this.palette.text_muted }
+            return {color: this.palette.text_muted}
         },
         panelStyle() {
             if (!this.palette) {
@@ -356,15 +356,15 @@ export default {
             this.startTimer()
         },
         async fetchConfig() {
-            const { data: user } = await api.get('/api/user')
+            const {data: user} = await api.get('/api/user')
             this.settings = user.user.settings
 
             if (this.settings && this.settings.color_palette_id) {
-                const { data: pal } = await api.get('/api/color-palettes/' + this.settings.color_palette_id)
+                const {data: pal} = await api.get('/api/color-palettes/' + this.settings.color_palette_id)
                 this.palette = pal
             }
 
-            const { data: imgs } = await api.get('/api/images', { params: { type: 'map' } })
+            const {data: imgs} = await api.get('/api/images', {params: {type: 'map'}})
             this.mapImages = imgs
         },
         pickRandomMap() {
@@ -442,11 +442,11 @@ export default {
             if (!dir) {
                 return base
             }
-            if (dir === 'L') {
+            if (dir === 'B') {
                 base.transform = 'rotate(180deg)'
-            } else if (dir === 'F') {
+            } else if (dir === 'E') {
                 base.transform = 'rotate(-90deg)'
-            } else if (dir === 'R') {
+            } else if (dir === 'J') {
                 base.transform = 'rotate(0deg)'
             }
             return base
